@@ -9,8 +9,11 @@ from detectron2.utils.visualizer import Visualizer
 from detectron2.data import MetadataCatalog, DatasetCatalog
 import torch
 import cv2
+import wandb
 
 # Read Image
+
+wandb.init(project = "Bounding Boxes detection")
 
 im = cv2.imread("input/k2.color.jpg")
 #cv2.imshow("Original Image",im)
@@ -30,3 +33,10 @@ outputs = predictor(im)
 
 print(outputs["instances"].pred_classes)
 print(outputs["instances"].pred_boxes)
+
+v = Visualizer(im[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
+out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+
+
+images = wandb.Image(out.get_image()[:, :, ::-1], caption="Image with predicted bounding boxes")
+wandb.log({"Image" : images})
