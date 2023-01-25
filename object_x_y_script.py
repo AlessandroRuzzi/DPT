@@ -13,7 +13,7 @@ import cv2
 # Read Image
 
 im = cv2.imread("input/k2.color.jpg")
-cv2.imshow("Original Image",im)
+#cv2.imshow("Original Image",im)
 
 # Predict Bounding Box
 
