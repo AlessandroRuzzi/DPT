@@ -1,0 +1,17 @@
+nP: 8  # number of patches along each axis
+out_dim: 128  # dim of local/global features, it total there will be 2 x out_dim numbers for each patch
+encode_mode: full # [visual, human, full]
+# visual feature extractor configs
+modality: rgba # can be rgba is want to use mask as well
+img_size: 256
+
+# Encoding to VQ configs
+ntoken: 512 # size of the code book
+blocks_dims: [128, 64, 64] # n channels in each block, len of the list determins the number of blocks
+
+# Human Encoding
+multires: 4
+d_in: 3
+gender: female
+n_joints: 24
+human_embed_dim: 256

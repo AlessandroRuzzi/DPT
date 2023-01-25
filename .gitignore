@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+t0021.000/
+saved_ckpt/
+
 # Distribution / packaging
 .Python
 build/
