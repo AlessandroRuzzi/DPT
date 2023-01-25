@@ -15,7 +15,7 @@ import wandb
 
 wandb.init(project = "Bounding Boxes detection")
 
-im = cv2.imread("input/k2.color.jpg")
+
 #cv2.imshow("Original Image",im)
 
 # Predict Bounding Box
@@ -27,16 +27,19 @@ cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  # set threshold for this model
 # Find a model from detectron2's model zoo. You can use the https://dl.fbaipublicfiles... url as well
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
 predictor = DefaultPredictor(cfg)
-outputs = predictor(im)
+
 
 # Print and Visualize Predictions
+for i in range(4):
+    im = cv2.imread(f"input/k{i}.color.jpg")
+    outputs = predictor(im)
 
-print(outputs["instances"].pred_classes)
-print(outputs["instances"].pred_boxes)
+    print(outputs["instances"].pred_classes)
+    print(outputs["instances"].pred_boxes)
 
-v = Visualizer(im[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
-out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+    v = Visualizer(im[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
+    out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
 
 
-images = wandb.Image(out.get_image()[:, :, ::-1], caption="Image with predicted bounding boxes")
-wandb.log({"Image" : images})
+    images = wandb.Image(out.get_image()[:, :, ::-1], caption="Image with predicted bounding boxes")
+    wandb.log({"Image" : images})
