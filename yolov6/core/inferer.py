@@ -138,6 +138,7 @@ class Inferer:
                 cv2.waitKey(1)  # 1 millisecond
 
             # Save results (image with detections)
+            """
             if save_img:
                 if self.files.type == 'image':
                     cv2.imwrite(save_path, img_src)
@@ -155,6 +156,7 @@ class Inferer:
                         save_path = str(Path(save_path).with_suffix('.mp4'))  # force *.mp4 suffix on results videos
                         vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
                     vid_writer.write(img_src)
+            """
 
             return img_src
 
