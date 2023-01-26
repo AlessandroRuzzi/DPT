@@ -47,7 +47,7 @@ for i in range(4):
 
 for i in range(4):
     #im = cv2.imread(f"input/k{i}.color.jpg")
-    outputs = run_inference(weights="saved_ckpt/yolov6l6.pt", source=f"input/k{i}.color.jpg", img_size=1280, device=0)
+    outputs = run_inference(weights="saved_ckpt/yolov6l6.pt", source=f"input/k{i}.color.jpg", img_size=1280)
 
     #print(outputs["instances"].pred_classes)
     #print(outputs["instances"].pred_boxes)
