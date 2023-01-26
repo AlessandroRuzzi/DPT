@@ -103,12 +103,12 @@ class Inferer:
                     if save_txt:  # Write to file
                         print("------------------------")
                         print(xyxy)
-                        print(xywh)
+                        print(cls, *xywh, conf)
                         print("------------------------")
                         xywh = (self.box_convert(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                         line = (cls, *xywh, conf)
-                        with open(txt_path + '.txt', 'a') as f:
-                            f.write(('%g ' * len(line)).rstrip() % line + '\n')
+                        #with open(txt_path + '.txt', 'a') as f:
+                        #    f.write(('%g ' * len(line)).rstrip() % line + '\n')
 
                     if save_img:
                         class_num = int(cls)  # integer class
