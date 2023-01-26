@@ -10,6 +10,7 @@ from detectron2.data import MetadataCatalog, DatasetCatalog
 import torch
 import cv2
 import wandb
+from yolov6.infer import run as run_inference
 
 # Read Image
 
@@ -42,4 +43,14 @@ for i in range(4):
 
 
     images = wandb.Image(out.get_image()[:, :, ::-1], caption="Image with predicted bounding boxes")
+    wandb.log({"Image" : images})
+
+for i in range(4):
+    #im = cv2.imread(f"input/k{i}.color.jpg")
+    outputs = run_inference(weights="saved_ckpt/yolov6l6.pt", source=f"input/k{i}.color.jpg", img_size=1280)
+
+    #print(outputs["instances"].pred_classes)
+    #print(outputs["instances"].pred_boxes)
+
+    images = wandb.Image(out, caption="Image with predicted bounding boxes")
     wandb.log({"Image" : images})
