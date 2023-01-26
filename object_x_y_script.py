@@ -24,7 +24,7 @@ wandb.init(project = "Bounding Boxes detection")
 cfg = get_cfg()
 # add project-specific config (e.g., TensorMask) here if you're not running a model in detectron2's core library
 cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
-cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.15  # set threshold for this model
+cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.10  # set threshold for this model
 # Find a model from detectron2's model zoo. You can use the https://dl.fbaipublicfiles... url as well
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
 predictor = DefaultPredictor(cfg)
@@ -43,7 +43,7 @@ for i in range(4):
 
 
     images = wandb.Image(out.get_image()[:, :, ::-1], caption="Image with predicted bounding boxes")
-    wandb.log({"Image" : images})
+    wandb.log({"Image Detectron2" : images})
 
 for i in range(4):
     #im = cv2.imread(f"input/k{i}.color.jpg")
@@ -53,4 +53,4 @@ for i in range(4):
     #print(outputs["instances"].pred_boxes)
 
     images = wandb.Image(outputs, caption="Image with predicted bounding boxes")
-    wandb.log({"Image" : images})
+    wandb.log({"Image YOLOv6" : images})
