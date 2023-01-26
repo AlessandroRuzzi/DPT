@@ -52,5 +52,5 @@ for i in range(4):
     #print(outputs["instances"].pred_classes)
     #print(outputs["instances"].pred_boxes)
 
-    images = wandb.Image(out, caption="Image with predicted bounding boxes")
+    images = wandb.Image(outputs, caption="Image with predicted bounding boxes")
     wandb.log({"Image" : images})
