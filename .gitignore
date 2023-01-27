@@ -6,7 +6,7 @@ __pycache__/
 # C extensions
 *.so
 
-t0021.000/
+t0*/
 saved_ckpt/
 
 # Distribution / packaging

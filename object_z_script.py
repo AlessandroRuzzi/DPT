@@ -16,22 +16,22 @@ import os
 
 cam_ext = [{
   "rotation": [
-    -0.10153006011608547,
-    0.019336641206071023,
-    -0.9946445300707627,
-    -0.011282787658231578,
-    0.9997243968707996,
-    0.02058710771274921,
-    0.9947684884411452,
-    0.013312573311902049,
-    -0.10128390689705759
+    0.0474064217091424,
+    -0.009122383458866162,
+    -0.9988340269037521,
+    0.03170146783561972,
+    0.9994683077189502,
+    -0.007623568881195128,
+    0.9983724996802564,
+    -0.03130309865570115,
+    0.04767040902645254
   ],
   "translation": [
-    2.4029417954677847,
-    0.0006033381196006956,
-    2.3380179860610997
+    2.0346436516706716,
+    0.15098991250346783,
+    1.9081762437475864
   ]
-},{
+}, {
   "rotation": [
     1.0,
     0.0,
@@ -48,39 +48,39 @@ cam_ext = [{
     0.0,
     0.0
   ]
-},{
+}, {
   "rotation": [
-    -0.017350607889147076,
-    -0.026920036050998547,
-    0.9994870024492014,
-    0.00019428987272378874,
-    0.9996373713560952,
-    0.026927458842665578,
-    -0.9998494479957091,
-    0.0006613979823255235,
-    -0.017339085771358613
+    -0.05503728305632398,
+    -0.06289408322381485,
+    0.9965014961199079,
+    -0.05425386983381036,
+    0.9967281872221686,
+    0.059911922059518126,
+    -0.9970092352038844,
+    -0.050766673046848176,
+    -0.058269458774904456
   ],
   "translation": [
-    -2.3940588412022525,
-    -0.1613792875051818,
-    2.3802714351100476
+    -2.433083212764053,
+    -0.11688068364320307,
+    2.2651873033288368
   ]
-},{
+}, {
   "rotation": [
-    -0.9981333653659891,
-    -0.015666431144359776,
-    0.05902836503211517,
-    -0.013929478981873385,
-    0.9994611058176012,
-    0.029723182419673092,
-    -0.05946221118037236,
-    0.028845465727886644,
-    -0.9978137023254812
+    -0.9975029504614801,
+    -0.05057702292283562,
+    -0.04929329135802324,
+    -0.04867391090404321,
+    0.9980501745867711,
+    -0.03907300096770227,
+    0.051173374111438255,
+    -0.03657613647693955,
+    -0.9980197753664364
   ],
   "translation": [
-    -0.08189590808177183,
-    -0.10562289543456643,
-    4.5437411730360555
+    -0.1568367955944705,
+    0.09637531452186283,
+    4.1251535116391835
   ]
 }]
 
@@ -128,6 +128,22 @@ def show_projection(ver, img):
     show(img)
 
 kid_list = [0,1,2,3]
+time_frame = 20
+object_name = "chair"
+
+#kid_list = [0]
+
+#y_pers_pos = [687,1403]
+#y_obj_pos = [1181]
+
+#x_pers_pos = [830,1137]
+#x_obj_pos = [1016]
+
+y_pers_pos = [678, 1261]
+y_obj_pos = [1157]
+
+x_pers_pos = [868,1165]
+x_obj_pos = [1136]
 
 for kid in kid_list:
 
@@ -135,14 +151,14 @@ for kid in kid_list:
 
   #output = joblib.load('t0021.000/person/fit02/person_fit.pkl') 
   #print(output.keys())
-  smpl = get_smplh(['t0021.000/person/fit02/person_fit.pkl'],"male" , "cpu")
+  smpl = get_smplh([f't00{time_frame}.000/person/fit02/person_fit.pkl'],"male" , "cpu")
   verts, jtr, tposed, naked = smpl()
   verts = torch.matmul(verts[0] - torch.Tensor(cam_ext[kid]["translation"]).reshape(1,-1,3) , torch.Tensor(cam_ext[kid]["rotation"]).reshape(3,3) )
 
 
   # Camera intrinsic parameters and Visualization
 
-  behave_verts, faces_idx = load_ply("t0021.000/person/fit02/person_fit.ply")
+  behave_verts, faces_idx = load_ply(f"t00{time_frame}.000/person/fit02/person_fit.ply")
   im = cv2.imread(f"input/k{kid}.color.jpg")
   behave_verts = behave_verts.reshape(-1, 3)
   #intrinsics = [bcu.load_intrinsics("t0021.000/calibs/intrinsics", i) for i in range(4)]
@@ -158,7 +174,7 @@ for kid in kid_list:
   gt_per_z = torch.min(verts[0,:,2]) + (torch.max(verts[0,:,2]) - torch.min(verts[0,:,2])) / 2.0
   print("GT Person z mean position --> ", gt_per_z)
 
-  h5_file = h5py.File(f"t0021.000/backpack/fit01/backpack_fit_k{kid}_sdf.h5", 'r')
+  h5_file = h5py.File(f"t00{time_frame}.000/{object_name}/fit01/{object_name}_fit_k{kid}_sdf.h5", 'r')
   norm_params = h5_file['norm_params'][:].astype(np.float32)
   bbox = h5_file['sdf_params'][:].astype(np.float32)
   norm_params = torch.Tensor(norm_params)
@@ -168,19 +184,23 @@ for kid in kid_list:
   bbox_scale = (bbox[1, 0]-bbox[0, 0]) * norm_params[3]
   bbox_center = (bbox[0] + bbox[1]) / 2.0 * norm_params[3] + norm_params[:3]
   bbox = torch.cat([bbox_center, bbox_scale.view(1)], dim=0)
+  print(bbox)
+  gt_obj_x = bbox[0]
+  gt_obj_y = bbox[1]
   gt_obj_z = bbox[2]
+  obj_dim = bbox[3]
   print("GT Object z mean position --> ", gt_obj_z)
 
   img = Image.open(f"input/k{kid}.color.jpg")
   convert_tensor = transforms.ToTensor()
   img_tensor = (convert_tensor(img).float() * 255).int()
 
-  mask_person = Image.open(f"t0021.000/k{kid}.person_mask.jpg")
+  mask_person = Image.open(f"t00{time_frame}.000/k{kid}.person_mask.jpg")
   mask_tensor_p = convert_tensor(mask_person) > 0.5
   #print(mask_tensor_p.shape)
   #print(torch.unique(mask_tensor_p))
 
-  mask_object = Image.open(f"t0021.000/k{kid}.obj_rend_mask.jpg")
+  mask_object = Image.open(f"t00{time_frame}.000/k{kid}.obj_rend_mask.jpg")
   mask_tensor_o = convert_tensor(mask_object) > 0.5
   #print(mask_tensor_o.shape)
   #print(torch.unique(mask_tensor_o))
@@ -208,14 +228,23 @@ for kid in kid_list:
   #print(torch.mean(img_tensor[mask_tensor_o]))
 
   #print(((1-torch.mean(img_tensor[mask_tensor_o])) * (torch.min(verts[0,:,2]) + (torch.max(verts[0,:,2]) - torch.min(verts[0,:,2])) / 2.0)) / (1-torch.mean(img_tensor[mask_tensor_p])))
+  pred_obj_x = (torch.min(verts[0,:,0]) * (x_pers_pos[1] - x_obj_pos[0]) + torch.max(verts[0,:,0]) * (x_obj_pos[0] - x_pers_pos[0])) / (x_pers_pos[1] - x_pers_pos[0]) #linear interpolation formula
+  pred_obj_y = (torch.min(verts[0,:,1]) * (y_pers_pos[1] - y_obj_pos[0]) + torch.max(verts[0,:,1]) * (y_obj_pos[0] - y_pers_pos[0])) / (y_pers_pos[1] - y_pers_pos[0]) #linear interpolation formula
   pred_obj_z = ((torch.mean(img_tensor[mask_tensor_p])) * (torch.min(verts[0,:,2]) + (torch.max(verts[0,:,2]) - torch.min(verts[0,:,2])) / 2.0)) / (torch.mean(img_tensor[mask_tensor_o]))
-  #pred_obj_z = (0.1 * ((torch.mean(img_tensor[mask_tensor_p]) - torch.mean(img_tensor[mask_tensor_o]))) + gt_per_z * (torch.mean(img_tensor[mask_tensor_o]) - torch.max(img_tensor))) / (torch.mean(img_tensor[mask_tensor_p]) - torch.max(img_tensor)) #linear interpolation formula
+  print(torch.max(verts[0,:,0]),torch.min(verts[0,:,0]))
+  print(torch.max(verts[0,:,1]),torch.min(verts[0,:,1]))
+  print("Pred Object x mean position --> ", pred_obj_x)
+  print("Pred Object y mean position --> ", pred_obj_y)
   print("Pred Object z mean position --> ", pred_obj_z)
   #img_tensor = focal / img_tensor
   #img_tensor[img_tensor >= 5 * focal] = np.inf
   #img_tensor = o3d.geometry.Image(img_tensor[0].numpy())
-
-  print("Percentage Error between GT and Pred:", ((abs(pred_obj_z-gt_obj_z))/gt_obj_z) * 100.0)
+  gt_obj_x *= -1
+  gt_obj_y *= -1
+  print("X Percentage Error between GT and Pred:", (abs((abs(pred_obj_x-gt_obj_x))/obj_dim)) * 100.0)
+  print("Y Percentage Error between GT and Pred:", (abs((abs(pred_obj_y-gt_obj_y))/obj_dim)) * 100.0)
+  print("Z Percentage Error between GT and Pred:", (abs((abs(pred_obj_z-gt_obj_z))/obj_dim)) * 100.0)
+  
 
   img = Image.fromarray((img_tensor[0].numpy() * 255).astype(np.uint8))
 
@@ -224,7 +253,7 @@ for kid in kid_list:
 
   #img.show()
 
-  img = Image.open("t0021.000/k2.depth.png")
+  img = Image.open(f"t00{time_frame}.000/k2.depth.png")
 
   #img.show()
 
