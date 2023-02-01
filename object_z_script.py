@@ -159,8 +159,8 @@ for kid in kid_list:
   x_obj_pos =  [object_center[0][0]]
   y_obj_pos = [object_center[0][1]]
 
-  print(y_pers_pos)
-  print(y_obj_pos)
+  #print(y_pers_pos)
+  #print(y_obj_pos)
 
   #output = joblib.load('t0021.000/person/fit02/person_fit.pkl') 
   #print(output.keys())

@@ -117,10 +117,10 @@ class Inferer:
                         #print(label)
                         #print("------------------------")
                         if class_num == 0:
-                            human_center = [(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3]/2)]
+                            human_center = [(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3])/2]
                             human_corners = xyxy
                         else:
-                            object_center_list.append(([(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3]/2)], label))
+                            object_center_list.append(([(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3])/2], label))
                         
                         #with open(txt_path + '.txt', 'a') as f:
                         #    f.write(('%g ' * len(line)).rstrip() % line + '\n')
