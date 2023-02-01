@@ -152,7 +152,7 @@ for kid in kid_list:
   outputs, human_center,human_corners, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=f"t00{time_frame}.000/k{kid}.color.jpg", img_size=1280)
 
   x_pers_pos = [human_corners[0],human_corners[2]]
-  y_pers_pos = [human_corners[1],human_corners[3]]
+  y_pers_pos = [human_corners[3],human_corners[1]]
   x_obj_pos =  [object_center[0][0]]
   y_obj_pos = [object_center[0][1]]
 
