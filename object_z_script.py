@@ -153,7 +153,8 @@ for kid in kid_list:
 
   x_pers_pos = [human_corners[0],human_corners[2]]
   y_pers_pos = [human_corners[1],human_corners[3]]
-  x_obj_pos, y_obj_pos = object_center[0]
+  x_obj_pos =  [object_center[0][0]]
+  y_obj_pos = [object_center[0][1]]
 
   #output = joblib.load('t0021.000/person/fit02/person_fit.pkl') 
   #print(output.keys())
