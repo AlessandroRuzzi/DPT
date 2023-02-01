@@ -108,13 +108,13 @@ class Inferer:
                     if save_txt:  # Write to file
                         xywh = (self.box_convert(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                         line = (cls, *xywh, conf)
-                        print("------------------------")
-                        print(xyxy)
-                        print(cls, *xywh, conf)
+                        #print("------------------------")
+                        #print(xyxy)
+                        #print(cls, *xywh, conf)
                         class_num = int(cls)  # integer class
                         label = None if hide_labels else (self.class_names[class_num] if hide_conf else f'{self.class_names[class_num]} {conf:.2f}')
-                        print(label)
-                        print("------------------------")
+                        #print(label)
+                        #print("------------------------")
                         if class_num == 0:
                             human_center = [(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3]/2)]
                         else:
