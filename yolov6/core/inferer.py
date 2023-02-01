@@ -19,6 +19,7 @@ from yolov6.data.data_augment import letterbox
 from yolov6.data.datasets import LoadData
 from yolov6.utils.nms import non_max_suppression
 from yolov6.utils.torch_utils import get_model_info
+from operator import itemgetter
 
 class Inferer:
     def __init__(self, source, webcam, webcam_addr, weights, device, yaml, img_size, half):
@@ -97,6 +98,10 @@ class Inferer:
             assert img_ori.data.contiguous, 'Image needs to be contiguous. Please apply to input images with np.ascontiguousarray(im).'
             self.font_check()
 
+            human_center = []
+            object_dist_list = []
+            object_center_list = []
+
             if len(det):
                 det[:, :4] = self.rescale(img.shape[2:], det[:, :4], img_src.shape).round()
                 for *xyxy, conf, cls in reversed(det):
@@ -106,7 +111,15 @@ class Inferer:
                         print("------------------------")
                         print(xyxy)
                         print(cls, *xywh, conf)
+                        class_num = int(cls)  # integer class
+                        label = None if hide_labels else (self.class_names[class_num] if hide_conf else f'{self.class_names[class_num]} {conf:.2f}')
+                        print(label)
                         print("------------------------")
+                        if class_num == 0:
+                            human_center = [(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3]/2)]
+                        else:
+                            object_center_list.append(([(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3]/2)], label))
+                        
                         #with open(txt_path + '.txt', 'a') as f:
                         #    f.write(('%g ' * len(line)).rstrip() % line + '\n')
 
@@ -115,6 +128,13 @@ class Inferer:
                         label = None if hide_labels else (self.class_names[class_num] if hide_conf else f'{self.class_names[class_num]} {conf:.2f}')
 
                         self.plot_box_and_label(img_ori, max(round(sum(img_ori.shape) / 2 * 0.003), 2), xyxy, label, color=self.generate_colors(class_num, True))
+                
+                for i, center in enumerate(object_center_list):
+                    class_num = int(cls)
+        
+                    object_dist_list.append(math.dist(human_center,center[0]))
+
+                pos, element = min(enumerate(object_dist_list), key=itemgetter(1))
 
                 img_src = np.asarray(img_ori)
 
@@ -162,7 +182,7 @@ class Inferer:
                     vid_writer.write(img_src)
             """
 
-            return img_src
+            return img_src, object_center_list[pos]
 
     @staticmethod
     def precess_image(img_src, img_size, stride, half):

@@ -153,7 +153,11 @@ for kid in kid_list:
   #print(output.keys())
   smpl = get_smplh([f't00{time_frame}.000/person/fit02/person_fit.pkl'],"male" , "cpu")
   verts, jtr, tposed, naked = smpl()
+  jtr = torch.cat((jtr[:, :22], jtr[:, 25:26], jtr[:, 40:41]), dim=1) # (N, 24, 3)
+  jtr = jtr.unsqueeze(1).unsqueeze(1).unsqueeze(1) # (N, 1, 1, 1, J, 3)
   verts = torch.matmul(verts[0] - torch.Tensor(cam_ext[kid]["translation"]).reshape(1,-1,3) , torch.Tensor(cam_ext[kid]["rotation"]).reshape(3,3) )
+
+  #print("JTR : ", jtr)
 
 
   # Camera intrinsic parameters and Visualization

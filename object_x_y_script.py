@@ -20,7 +20,7 @@ wandb.init(project = "Bounding Boxes detection")
 #cv2.imshow("Original Image",im)
 
 # Predict Bounding Box
-
+"""
 cfg = get_cfg()
 # add project-specific config (e.g., TensorMask) here if you're not running a model in detectron2's core library
 cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
@@ -31,6 +31,7 @@ predictor = DefaultPredictor(cfg)
 
 
 # Print and Visualize Predictions
+
 for i in range(4):
     im = cv2.imread(f"input/k{i}.color.jpg")
     outputs = predictor(im)
@@ -44,13 +45,14 @@ for i in range(4):
 
     images = wandb.Image(out.get_image()[:, :, ::-1], caption="Image with predicted bounding boxes")
     wandb.log({"Image Detectron2" : images})
+"""
 
 for i in range(4):
     #im = cv2.imread(f"input/k{i}.color.jpg")
-    outputs = run_inference(weights="saved_ckpt/yolov6l6.pt", source=f"input/k{i}.color.jpg", img_size=1280)
+    outputs, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=f"input/k{i}.color.jpg", img_size=1280)
 
-    #print(outputs["instances"].pred_classes)
-    #print(outputs["instances"].pred_boxes)
+    print("MIN OBJECT BBOX-->", object_center[0])
+    print("LABEL MIN BBOX -->", object_center[1])
 
     images = wandb.Image(outputs[:, :, ::-1], caption="Image with predicted bounding boxes")
     wandb.log({"Image YOLOv6" : images})
