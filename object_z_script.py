@@ -129,6 +129,7 @@ def show_projection(ver, img):
         img = cv2.circle(img, (ver[i, 0].int().item(), ver[i, 1].int().item()), 2, (255, 0, 0), 1)
     show(img)
 
+"""
 torch.backends.cudnn.enabled = True
 torch.backends.cudnn.benchmark = True
 # compute depth maps
@@ -139,7 +140,7 @@ run(
     "dpt_hybrid",
     True,
 )
-
+"""
 kid_list = [0,1,2,3]
 time_frame = 20
 object_name = "chair"
