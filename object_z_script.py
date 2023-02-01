@@ -13,6 +13,7 @@ from functools import partial
 from pytorch3d.io import load_ply
 import json
 import os
+from yolov6.infer import run as run_inference
 
 cam_ext = [{
   "rotation": [
@@ -131,23 +132,14 @@ kid_list = [0,1,2,3]
 time_frame = 20
 object_name = "chair"
 
-#kid_list = [0]
-
-#y_pers_pos = [687,1403]
-#y_obj_pos = [1181]
-
-#x_pers_pos = [830,1137]
-#x_obj_pos = [1016]
-
-y_pers_pos = [678, 1261]
-y_obj_pos = [1157]
-
-x_pers_pos = [868,1165]
-x_obj_pos = [1136]
-
 for kid in kid_list:
 
   # SMPL parameters
+
+  outputs, human_center, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=f"t00{time_frame}.000/k{kid}.color.jpg", img_size=1280)
+
+  x_pers_pos, y_pers_pos = human_center
+  x_obj_pos, y_obj_pos = object_center[0]
 
   #output = joblib.load('t0021.000/person/fit02/person_fit.pkl') 
   #print(output.keys())

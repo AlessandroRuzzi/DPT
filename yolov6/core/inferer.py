@@ -182,7 +182,7 @@ class Inferer:
                     vid_writer.write(img_src)
             """
 
-            return img_src, object_center_list[pos]
+            return img_src, human_center, object_center_list[pos]
 
     @staticmethod
     def precess_image(img_src, img_size, stride, half):
