@@ -99,6 +99,7 @@ class Inferer:
             self.font_check()
 
             human_center = []
+            human_corners = []
             object_dist_list = []
             object_center_list = []
 
@@ -117,6 +118,7 @@ class Inferer:
                         #print("------------------------")
                         if class_num == 0:
                             human_center = [(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3]/2)]
+                            human_corners = xyxy
                         else:
                             object_center_list.append(([(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3]/2)], label))
                         
@@ -182,7 +184,7 @@ class Inferer:
                     vid_writer.write(img_src)
             """
 
-            return img_src, human_center, object_center_list[pos]
+            return img_src, human_center, human_corners, object_center_list[pos]
 
     @staticmethod
     def precess_image(img_src, img_size, stride, half):

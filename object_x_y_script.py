@@ -49,7 +49,7 @@ for i in range(4):
 
 for i in range(4):
     #im = cv2.imread(f"input/k{i}.color.jpg")
-    outputs, human_center, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=f"input/k{i}.color.jpg", img_size=1280)
+    outputs, human_center, human_corners,object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=f"input/k{i}.color.jpg", img_size=1280)
 
     print("MIN OBJECT BBOX-->", object_center[0])
     print("LABEL MIN BBOX -->", object_center[1])
