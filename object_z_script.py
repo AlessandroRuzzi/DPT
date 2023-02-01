@@ -14,6 +14,7 @@ from pytorch3d.io import load_ply
 import json
 import os
 from yolov6.infer import run as run_inference
+from run_monodepth import run
 
 cam_ext = [{
   "rotation": [
@@ -127,6 +128,17 @@ def show_projection(ver, img):
     for i in range(ver.shape[0]):
         img = cv2.circle(img, (ver[i, 0].int().item(), ver[i, 1].int().item()), 2, (255, 0, 0), 1)
     show(img)
+
+torch.backends.cudnn.enabled = True
+torch.backends.cudnn.benchmark = True
+# compute depth maps
+run(
+    "input",
+    "output_monodepth",
+    "weights/dpt_large-midas-2f21e586.pt",
+    "dpt_hybrid",
+    True,
+)
 
 kid_list = [0,1,2,3]
 time_frame = 20
