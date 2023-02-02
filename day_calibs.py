@@ -1,9 +1,7 @@
 
 class Cam_Cal():
       def __init__(self):
-            
-
-          self.cam = {3: [{
+            self.cam = {3: [{
                         "rotation": [
                           0.0474064217091424,
                           -0.009122383458866162,
@@ -142,5 +140,5 @@ class Cam_Cal():
                         ]
                       }]}
 
-      def get_cal(self,day):
+      def get_cal(self, day):
         return self.cam[day]

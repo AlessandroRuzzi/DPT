@@ -71,7 +71,7 @@ time_frame = 20
 day = 3
 object_name = "chair"
 
-cam_ext = Cam_Cal.get_cal(day)
+cam_ext = cam_cal.get_cal(day)
 
 torch.backends.cudnn.enabled = True
 torch.backends.cudnn.benchmark = True
