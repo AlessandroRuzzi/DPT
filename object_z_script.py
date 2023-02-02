@@ -183,14 +183,14 @@ for kid in kid_list:
   #print(torch.mean(img_tensor))
   #print(torch.mean(img_tensor[mask_tensor_p]))
   #print(torch.mean(img_tensor[mask_tensor_o]))
-  print(img_tensor.shape)
-  print(torch.mean(img_tensor[0,x_pers_pos[0].int(): ,:]))
+ # print(img_tensor.shape)
+  #print(torch.mean(img_tensor[0,x_pers_pos[0].int(): ,:]))
 
   #print(((1-torch.mean(img_tensor[mask_tensor_o])) * (torch.min(verts[0,:,2]) + (torch.max(verts[0,:,2]) - torch.min(verts[0,:,2])) / 2.0)) / (1-torch.mean(img_tensor[mask_tensor_p])))
   pred_obj_x = (torch.min(verts[0,:,0]) * (x_pers_pos[1] - x_obj_pos[0]) + torch.max(verts[0,:,0]) * (x_obj_pos[0] - x_pers_pos[0])) / (x_pers_pos[1] - x_pers_pos[0]) #linear interpolation formula
   pred_obj_y = (torch.min(verts[0,:,1]) * (y_pers_pos[1] - y_obj_pos[0]) + torch.max(verts[0,:,1]) * (y_obj_pos[0] - y_pers_pos[0])) / (y_pers_pos[1] - y_pers_pos[0]) #linear interpolation formula
   #pred_obj_z = ((torch.mean(img_tensor[mask_tensor_p])) * (torch.min(verts[0,:,2]) + (torch.max(verts[0,:,2]) - torch.min(verts[0,:,2])) / 2.0)) / (torch.mean(img_tensor[mask_tensor_o]))
-  pred_obj_z = ((torch.mean(img_tensor[0,x_pers_pos[0]: x_pers_pos[1],y_pers_pos[0]: y_pers_pos[1]])) * (torch.min(verts[0,:,2]) + (torch.max(verts[0,:,2]) - torch.min(verts[0,:,2])) / 2.0)) / (torch.mean(img_tensor[0,object_center[2][0]:object_center[2][2],object_center[2][1]:object_center[2][3]]))
+  pred_obj_z = ((torch.mean(img_tensor[0,x_pers_pos[0].int(): x_pers_pos[1].int(),y_pers_pos[0].int(): y_pers_pos[1].int()])) * (torch.min(verts[0,:,2]) + (torch.max(verts[0,:,2]) - torch.min(verts[0,:,2])) / 2.0)) / (torch.mean(img_tensor[0,object_center[2][0].int():object_center[2][2].int(),object_center[2][1].int():object_center[2][3].int()]))
   print(torch.max(verts[0,:,0]),torch.min(verts[0,:,0]))
   print(torch.max(verts[0,:,1]),torch.min(verts[0,:,1]))
   print("Pred Object x mean position --> ", pred_obj_x)
