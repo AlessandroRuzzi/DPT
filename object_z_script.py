@@ -183,6 +183,8 @@ for kid in kid_list:
   #print(torch.mean(img_tensor))
   #print(torch.mean(img_tensor[mask_tensor_p]))
   #print(torch.mean(img_tensor[mask_tensor_o]))
+  print(img_tensor.shape)
+  print(torch.mean(img_tensor[x_pers_pos[0]: x_pers_pos[1],y_pers_pos[0]: y_pers_pos[1]]))
 
   #print(((1-torch.mean(img_tensor[mask_tensor_o])) * (torch.min(verts[0,:,2]) + (torch.max(verts[0,:,2]) - torch.min(verts[0,:,2])) / 2.0)) / (1-torch.mean(img_tensor[mask_tensor_p])))
   pred_obj_x = (torch.min(verts[0,:,0]) * (x_pers_pos[1] - x_obj_pos[0]) + torch.max(verts[0,:,0]) * (x_obj_pos[0] - x_pers_pos[0])) / (x_pers_pos[1] - x_pers_pos[0]) #linear interpolation formula
