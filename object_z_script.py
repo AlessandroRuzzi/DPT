@@ -16,78 +16,11 @@ import os
 from yolov6.infer import run as run_inference
 from run_monodepth import run
 import wandb
+from day_calibs import Cam_Cal
 
 wandb.init(project = "Bounding Boxes detection")
+cam_cal = Cam_Cal()
 
-cam_ext = [{
-  "rotation": [
-    0.0474064217091424,
-    -0.009122383458866162,
-    -0.9988340269037521,
-    0.03170146783561972,
-    0.9994683077189502,
-    -0.007623568881195128,
-    0.9983724996802564,
-    -0.03130309865570115,
-    0.04767040902645254
-  ],
-  "translation": [
-    2.0346436516706716,
-    0.15098991250346783,
-    1.9081762437475864
-  ]
-}, {
-  "rotation": [
-    1.0,
-    0.0,
-    0.0,
-    0.0,
-    1.0,
-    0.0,
-    0.0,
-    0.0,
-    1.0
-  ],
-  "translation": [
-    0.0,
-    0.0,
-    0.0
-  ]
-}, {
-  "rotation": [
-    -0.05503728305632398,
-    -0.06289408322381485,
-    0.9965014961199079,
-    -0.05425386983381036,
-    0.9967281872221686,
-    0.059911922059518126,
-    -0.9970092352038844,
-    -0.050766673046848176,
-    -0.058269458774904456
-  ],
-  "translation": [
-    -2.433083212764053,
-    -0.11688068364320307,
-    2.2651873033288368
-  ]
-}, {
-  "rotation": [
-    -0.9975029504614801,
-    -0.05057702292283562,
-    -0.04929329135802324,
-    -0.04867391090404321,
-    0.9980501745867711,
-    -0.03907300096770227,
-    0.051173374111438255,
-    -0.03657613647693955,
-    -0.9980197753664364
-  ],
-  "translation": [
-    -0.1568367955944705,
-    0.09637531452186283,
-    4.1251535116391835
-  ]
-}]
 
 def load_intrinsics(intrinsic_folder, kid):
     with open(os.path.join(intrinsic_folder, f"{kid}", "calibration.json"), "r") as json_file:
@@ -132,21 +65,25 @@ def show_projection(ver, img):
         img = cv2.circle(img, (ver[i, 0].int().item(), ver[i, 1].int().item()), 2, (255, 0, 0), 1)
     show(img)
 
-"""
+
+kid_list = [0,1,2,3]
+time_frame = 20
+day = 3
+object_name = "chair"
+
+cam_ext = Cam_Cal.get_cal(day)
+
 torch.backends.cudnn.enabled = True
 torch.backends.cudnn.benchmark = True
 # compute depth maps
 run(
-    "input",
+    f"t00{time_frame}.000",
     "output_monodepth",
     "weights/dpt_large-midas-2f21e586.pt",
-    "dpt_hybrid",
+    "dpt_large",
     True,
 )
-"""
-kid_list = [0,1,2,3]
-time_frame = 20
-object_name = "chair"
+
 
 for kid in kid_list:
 

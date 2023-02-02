@@ -117,7 +117,7 @@ def run(input_path, output_path, model_path, model_type="dpt_hybrid", optimize=T
     model.to(device)
 
     # get input
-    img_names = glob.glob(os.path.join(input_path, "*"))
+    img_names = glob.glob(os.path.join(input_path, "*.color.jpg"))
     num_images = len(img_names)
 
     # create output folder
