@@ -67,9 +67,9 @@ def show_projection(ver, img):
 
 
 kid_list = [0,1,2,3]
-time_frame = 20
-day = 3
-object_name = "chair"
+time_frame = 21
+day = 4
+object_name = "backpack"
 
 cam_ext = cam_cal.get_cal(day)
 
