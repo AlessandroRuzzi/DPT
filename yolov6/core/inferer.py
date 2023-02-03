@@ -172,7 +172,7 @@ class Inferer:
                             human_center = [(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3])/2]
                             human_corners = xyxy
                         else:
-                            object_center_list.append(([(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3])/2], label, xyxy, get_iou(human_corners, xyxy)))
+                            object_center_list.append(([(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3])/2], label, xyxy))
                         
                         #with open(txt_path + '.txt', 'a') as f:
                         #    f.write(('%g ' * len(line)).rstrip() % line + '\n')
@@ -186,7 +186,7 @@ class Inferer:
                 for i, center in enumerate(object_center_list):
                     class_num = int(cls)
         
-                    object_dist_list.append(object_center_list[3])
+                    object_dist_list.append(get_iou(human_corners, center[2]))
 
                 pos, element = max(enumerate(object_dist_list), key=itemgetter(1))
 
