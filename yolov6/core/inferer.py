@@ -41,6 +41,8 @@ def get_iou(bb1, bb2):
     float
         in [0, 1]
     """
+    print(bb1)
+    print(bb2)
     assert bb1[0] < bb1[2]
     assert bb1[1] < bb1[3]
     assert bb2[0] < bb2[2]
