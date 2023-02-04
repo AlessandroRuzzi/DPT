@@ -32,7 +32,7 @@ def calc_z(img_tensor, mask_tensor_p, mask_tensor_o, x_pers_pos, x_obj_pos, y_pe
 
     pred_obj_z = ((torch.mean(img_tensor[mask_tensor_p])) * (torch.min(verts[0,:,2]))) / (torch.mean(img_tensor[mask_tensor_o]))
 
-    z = pred_obj_z + lenght/2
+    z = pred_obj_z + gt_lenght/2 #lenght/2
 
 
     return z, lenght
