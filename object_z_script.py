@@ -21,7 +21,7 @@ from day_calibs import Cam_Cal
 wandb.init(project = "Bounding Boxes detection")
 cam_cal = Cam_Cal()
 
-def calc_z(img_tensor, mask_tensor_p, mask_tensor_o, x_pers_pos, x_obj_pos, y_pers_pos, y_obj_pos):
+def calc_z(img_tensor, mask_tensor_p, mask_tensor_o, x_pers_pos, x_obj_pos, y_pers_pos, y_obj_pos, gt_lenght):
 
     pred_obj_x_top = (torch.min(verts[0,:,0]) * (x_pers_pos[1] - x_obj_pos[2]) + torch.max(verts[0,:,0]) * (x_obj_pos[2] - x_pers_pos[0])) / (x_pers_pos[1] - x_pers_pos[0]) #linear interpolation formula
     pred_obj_x_bottom = (torch.min(verts[0,:,0]) * (x_pers_pos[1] - x_obj_pos[1]) + torch.max(verts[0,:,0]) * (x_obj_pos[1] - x_pers_pos[0])) / (x_pers_pos[1] - x_pers_pos[0]) #linear interpolation formula    
@@ -212,7 +212,7 @@ for kid in kid_list:
   pred_obj_x = (torch.min(verts[0,:,0]) * (x_pers_pos[1] - x_obj_pos[0]) + torch.max(verts[0,:,0]) * (x_obj_pos[0] - x_pers_pos[0])) / (x_pers_pos[1] - x_pers_pos[0]) #linear interpolation formula
   pred_obj_y = (torch.min(verts[0,:,1]) * (y_pers_pos[1] - y_obj_pos[0]) + torch.max(verts[0,:,1]) * (y_obj_pos[0] - y_pers_pos[0])) / (y_pers_pos[1] - y_pers_pos[0]) #linear interpolation formula
   #pred_obj_z = ((torch.mean(img_tensor[mask_tensor_p])) * (torch.min(verts[0,:,2]) + (torch.max(verts[0,:,2]) - torch.min(verts[0,:,2])) / 2.0)) / (torch.mean(img_tensor[mask_tensor_o]))
-  pred_obj_z, lenght = calc_z(img_tensor, mask_tensor_p, mask_tensor_o, x_pers_pos, x_obj_pos, y_pers_pos, y_obj_pos )
+  pred_obj_z, lenght = calc_z(img_tensor, mask_tensor_p, mask_tensor_o, x_pers_pos, x_obj_pos, y_pers_pos, y_obj_pos, obj_dim )
   #pred_obj_z = ((torch.mean(img_tensor[0,x_pers_pos[0].int(): x_pers_pos[1].int(),y_pers_pos[0].int(): y_pers_pos[1].int()])) * (torch.min(verts[0,:,2]) + (torch.max(verts[0,:,2]) - torch.min(verts[0,:,2])) / 2.0)) / (torch.mean(img_tensor[0,object_center[2][0].int():object_center[2][2].int(),object_center[2][1].int():object_center[2][3].int()]))
   print(torch.max(verts[0,:,0]),torch.min(verts[0,:,0]))
   print(torch.max(verts[0,:,1]),torch.min(verts[0,:,1]))
