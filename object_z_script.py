@@ -29,6 +29,12 @@ def calc_lenght(img_tensor, mask_tensor_p, mask_tensor_o, x_pers_pos, x_obj_pos,
     pred_obj_y_bottom = (torch.min(verts[0,:,1]) * (y_pers_pos[1] - y_obj_pos[1]) + torch.max(verts[0,:,1]) * (y_obj_pos[1] - y_pers_pos[0])) / (y_pers_pos[1] - y_pers_pos[0]) #linear interpolation formula
 
     pred_obj_z_surface = ((torch.mean(img_tensor[mask_tensor_p])) * (torch.min(verts[0,:,2]))) / (torch.mean(img_tensor[mask_tensor_o]))
+
+    print(pred_obj_z_surface)
+    print(pred_obj_z)
+    print(abs(pred_obj_z - pred_obj_z_surface) * 2)
+    print(abs(pred_obj_y_top-pred_obj_y_bottom))
+
     lenght = max(abs(pred_obj_x_top-pred_obj_x_bottom),abs(pred_obj_y_top-pred_obj_y_bottom), abs(pred_obj_z - pred_obj_z_surface) * 2)
 
     #z = pred_obj_z + lenght/2
