@@ -32,7 +32,7 @@ def calc_z(img_tensor, mask_tensor_p, mask_tensor_o, x_pers_pos, x_obj_pos, y_pe
 
     pred_obj_z = ((torch.mean(img_tensor[mask_tensor_p])) * (torch.min(verts[0,:,2]))) / (torch.mean(img_tensor[mask_tensor_o]))
 
-    z = pred_obj_z + gt_lenght/2 #lenght/2
+    z = pred_obj_z + lenght/2
 
 
     return z, lenght
@@ -84,7 +84,7 @@ def show_projection(ver, img):
 
 
 kid_list = [0,1,2,3]
-
+"""
 time_frame = 21
 day = 4
 object_name = "backpack"
@@ -92,7 +92,7 @@ object_name = "backpack"
 time_frame = 20
 day = 3
 object_name = "chair"
-"""
+
 cam_ext = cam_cal.get_cal(day)
 
 torch.backends.cudnn.enabled = True
