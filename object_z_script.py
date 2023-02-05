@@ -259,5 +259,5 @@ def run_preprocessing(dataset_path):
 
 if __name__ == "__main__":
 
-    dataset_path = "/data/xiwang/Behave/sequences/"
+    dataset_path = "/data/xiwang/behave/sequences/"
     run_preprocessing(dataset_path)
