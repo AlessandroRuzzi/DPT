@@ -129,7 +129,7 @@ def run_preprocessing(dataset_path):
 
                 for kid in kid_list:
 
-                    cam_ext = json.load(os.path.join(dataset_path, f"calibs/Date0{day}/config/{kid}/config.json"))
+                    cam_ext = json.load(open(os.path.join(dataset_path, f"calibs/Date0{day}/config/{kid}/config.json")))
                     print(cam_ext)
                     print(cam_ext["translation"])
                     print(cam_ext["rotation"])
