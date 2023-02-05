@@ -109,7 +109,7 @@ def run_preprocessing(dataset_path):
         time_folders.sort()
 
         for time in time_folders:
-            curr_time_folder_path = os.path.join(curr_folder_path, time_folders)
+            curr_time_folder_path = os.path.join(curr_folder_path, time)
             
             """
             cam_ext = cam_cal.get_cal(day)
