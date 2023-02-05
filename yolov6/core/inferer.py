@@ -186,7 +186,10 @@ class Inferer:
         
                     object_dist_list.append(get_iou(human_corners, center[2]))
 
-                pos, element = max(enumerate(object_dist_list), key=itemgetter(1))
+                if len(object_dist_list) != 0:
+                    pos, element = max(enumerate(object_dist_list), key=itemgetter(1))
+                else:
+                    return img_src, human_center, human_corners, (human_center, "human", human_corners)
 
                 img_src = np.asarray(img_ori)
 
