@@ -96,7 +96,7 @@ def run_preprocessing(dataset_path):
     sub_folders.sort()
 
     kid_list = [0,1,2,3]
-    error_dict = {'x' : 0, 'y' : 0, 'z': 0, 'l': 0}
+    error_dict = {'x' : 0, 'y' : 0, 'z': 0, 'z_optional' : 0, 'l': 0 , 'num_imgs' : 0}
     
     for folder in sub_folders:
 
@@ -135,8 +135,8 @@ def run_preprocessing(dataset_path):
                     
                     outputs, human_center,human_corners, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"), img_size=1280)
 
-                    images = wandb.Image(outputs[:, :, ::-1], caption="Image with predicted bounding boxes")
-                    wandb.log({"Image YOLOv6" : images})
+                    #images = wandb.Image(outputs[:, :, ::-1], caption="Image with predicted bounding boxes")
+                    #wandb.log({"Image YOLOv6" : images})
 
                     x_pers_pos = [human_corners[0],human_corners[2]]
                     y_pers_pos = [human_corners[1],human_corners[3]]
@@ -164,27 +164,24 @@ def run_preprocessing(dataset_path):
                     #projector = get_local_projector(calibration_matrix, dist_coefs)
                     #show_projection(torch.from_numpy(projector(verts[0].detach().cpu().numpy())), im[:,:,::-1].copy())
 
-                    #print(torch.max(verts[0,:,2]))
-                    #print(torch.min(verts[0,:,2]))
                     gt_per_z = torch.min(verts[0,:,2]) + (torch.max(verts[0,:,2]) - torch.min(verts[0,:,2])) / 2.0
-                    print("GT Person z mean position --> ", gt_per_z)
+                    #print("GT Person z mean position --> ", gt_per_z)
 
                     h5_file = h5py.File(os.path.join(curr_time_folder_path,f"{object_name}/fit01/{object_name}_fit_k{kid}_sdf.h5"), 'r')
                     norm_params = h5_file['norm_params'][:].astype(np.float32)
                     bbox = h5_file['sdf_params'][:].astype(np.float32)
                     norm_params = torch.Tensor(norm_params)
-                    #print(norm_params)
                     bbox = torch.Tensor(bbox).view(2, 3)
 
                     bbox_scale = (bbox[1, 0]-bbox[0, 0]) * norm_params[3]
                     bbox_center = (bbox[0] + bbox[1]) / 2.0 * norm_params[3] + norm_params[:3]
                     bbox = torch.cat([bbox_center, bbox_scale.view(1)], dim=0)
-                    print(bbox)
+                    #print(bbox)
                     gt_obj_x = bbox[0]
                     gt_obj_y = bbox[1]
                     gt_obj_z = bbox[2]
                     obj_dim = bbox[3]
-                    print("GT Object z mean position --> ", gt_obj_z)
+                    #print("GT Object z mean position --> ", gt_obj_z)
 
                     
 
@@ -194,37 +191,18 @@ def run_preprocessing(dataset_path):
 
                     mask_person = Image.open(os.path.join(curr_time_folder_path,f"k{kid}.person_mask.jpg"))
                     mask_tensor_p = convert_tensor(mask_person) > 0.5
-                    #print(mask_tensor_p.shape)
-                    #print(torch.unique(mask_tensor_p))
+
 
                     mask_object = Image.open(os.path.join(curr_time_folder_path,f"k{kid}.obj_rend_mask.jpg"))
                     mask_tensor_o = convert_tensor(mask_object) > 0.5
-                    #print(mask_tensor_o.shape)
-                    #print(torch.unique(mask_tensor_o))
+
 
                     img = Image.open(f"output_monodepth/k{kid}.color.png")
 
-                    #img.show()
 
                     convert_tensor = transforms.ToTensor()
 
                     img_tensor = convert_tensor(img).float()
-                    #print(torch.unique(img_tensor))
-                    #print(len(torch.unique(img_tensor)))
-
-                    #batch,heigth,width = img_tensor.shape
-                    #img_tensor = img_tensor.view(batch,-1)
-                    #img_tensor -= img_tensor.min(1, keepdim=True)[0]
-                    #img_tensor /= img_tensor.max(1, keepdim=True)[0]
-                    #img_tensor[0,2000:3100000] = 1.0
-                    #img_tensor = img_tensor.view(batch,heigth,width)
-
-
-                    #print(torch.mean(img_tensor))
-                    #print(torch.mean(img_tensor[mask_tensor_p]))
-                    #print(torch.mean(img_tensor[mask_tensor_o]))
-                    # print(img_tensor.shape)
-                    #print(torch.mean(img_tensor[0,x_pers_pos[0].int(): ,:]))
 
                     #print(((1-torch.mean(img_tensor[mask_tensor_o])) * (torch.min(verts[0,:,2]) + (torch.max(verts[0,:,2]) - torch.min(verts[0,:,2])) / 2.0)) / (1-torch.mean(img_tensor[mask_tensor_p])))
                     pred_obj_x = (torch.min(verts[0,:,0]) * (x_pers_pos[1] - x_obj_pos[0]) + torch.max(verts[0,:,0]) * (x_obj_pos[0] - x_pers_pos[0])) / (x_pers_pos[1] - x_pers_pos[0]) #linear interpolation formula
@@ -232,43 +210,40 @@ def run_preprocessing(dataset_path):
                     pred_obj_z = ((torch.mean(img_tensor[mask_tensor_p])) * (torch.min(verts[0,:,2]) + (torch.max(verts[0,:,2]) - torch.min(verts[0,:,2])) / 2.0)) / (torch.mean(img_tensor[mask_tensor_o]))
                     pred_obj_z_ref, lenght = calc_lenght(img_tensor, verts, mask_tensor_p, mask_tensor_o, x_pers_pos, x_obj_pos, y_pers_pos, y_obj_pos, pred_obj_z, obj_dim )
                     #pred_obj_z = ((torch.mean(img_tensor[0,x_pers_pos[0].int(): x_pers_pos[1].int(),y_pers_pos[0].int(): y_pers_pos[1].int()])) * (torch.min(verts[0,:,2]) + (torch.max(verts[0,:,2]) - torch.min(verts[0,:,2])) / 2.0)) / (torch.mean(img_tensor[0,object_center[2][0].int():object_center[2][2].int(),object_center[2][1].int():object_center[2][3].int()]))
+                    
+                    error_dict['x'] += (abs((abs(pred_obj_x-gt_obj_x))/obj_dim)) * 100.0
+                    error_dict['y'] += (abs((abs(pred_obj_y-gt_obj_y))/obj_dim)) * 100.0
+                    error_dict['z'] += (abs((abs(pred_obj_z-gt_obj_z))/obj_dim)) * 100.0
+                    error_dict['z_optional'] += (abs((abs(pred_obj_z_ref-gt_obj_z))/obj_dim)) * 100.0
+                    error_dict['l'] += (abs((abs(lenght - obj_dim))/obj_dim)) * 100.0
+                    error_dict['num_imgs'] += 1
+
+                    """
                     print(torch.max(verts[0,:,0]),torch.min(verts[0,:,0]))
                     print(torch.max(verts[0,:,1]),torch.min(verts[0,:,1]))
                     print("Pred Object x mean position --> ", pred_obj_x)
                     print("Pred Object y mean position --> ", pred_obj_y)
                     print("Pred Object z mean position --> ", pred_obj_z)
                     print("Pred Object lenght --> ", lenght)
-                    #img_tensor = focal / img_tensor
-                    #img_tensor[img_tensor >= 5 * focal] = np.inf
-                    #img_tensor = o3d.geometry.Image(img_tensor[0].numpy())
+
                     gt_obj_x *= -1
                     gt_obj_y *= -1
                     print("X Percentage Error between GT and Pred:", (abs((abs(pred_obj_x-gt_obj_x))/obj_dim)) * 100.0)
                     print("Y Percentage Error between GT and Pred:", (abs((abs(pred_obj_y-gt_obj_y))/obj_dim)) * 100.0)
                     print("Z Percentage Error between GT and Pred:", (abs((abs(pred_obj_z-gt_obj_z))/obj_dim)) * 100.0)
                     print("Lenght Percentage Error between GT and Pred:", (abs((abs(lenght - obj_dim))/obj_dim)) * 100.0)
+                    """
+                print("-------------------------------------")
+                print("X Error: ", error_dict['x'] / error_dict['num_imgs'])
+                print("Y Error: ", error_dict['y'] / error_dict['num_imgs'])
+                print("Z Error: ", error_dict['z'] / error_dict['num_imgs'])
+                print("Z_optional Error: ", error_dict['z_optional'] / error_dict['num_imgs'])
+                print("Lenght Error: ", error_dict['l'] / error_dict['num_imgs'])
+                print("-------------------------------------")
+                
 
-
-                    #img = Image.fromarray((img_tensor[0].numpy() * 255).astype(np.uint8))
-
-                    #print(torch.unique(img_tensor))
-                    #print(len(torch.unique(img_tensor)))
-
-                    #img.show()
-
-                    #img = Image.open(f"t00{time_frame}.000/k2.depth.png")
-
-                    #img.show()
-
-                    #convert_tensor = transforms.ToTensor()
-
-                    #img_tensor = convert_tensor(img)
-
-                    #print(torch.unique(img_tensor))
-                    #print(len(torch.unique(img_tensor)))
-
-                break
-        break
+                #break
+        #break
 
 if __name__ == "__main__":
 
