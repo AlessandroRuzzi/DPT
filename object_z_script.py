@@ -89,7 +89,7 @@ def run_preprocessing(dataset_path):
     sub_folders.sort()
     
     for i in sub_folders:
-        strtok = [int(x) for x in i.split('_') if x.strip()]
+        strtok = [str(x) for x in i.split('_') if x.strip()]
         object_name = strtok[2]
         print(object_name)
 
