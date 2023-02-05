@@ -100,7 +100,7 @@ def run_preprocessing(dataset_path):
     
     for folder in sub_folders:
 
-        curr_folder_path = os.path.join(dataset_path,folder)
+        curr_folder_path = os.path.join(sequences_path,folder)
 
         strtok = [str(x) for x in folder.split('_') if x.strip()]
         day = int(strtok[0][-2:])
@@ -133,7 +133,7 @@ def run_preprocessing(dataset_path):
 
                     h5_file = h5py.File(os.path.join(curr_time_folder_path,f"{object_name}/fit01/{object_name}_fit_k{kid}_sdf.h5"), 'r')
 
-                    cam_ext = json.load(open(os.path.join(dataset_path, f"Date0{day}/config/{kid}/config.json")))
+                    cam_ext = json.load(open(os.path.join(calibs_path, f"Date0{day}/config/{kid}/config.json")))
                     print(cam_ext)
                     print(cam_ext["translation"])
                     print(cam_ext["rotation"])
