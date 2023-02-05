@@ -85,7 +85,9 @@ def show_projection(ver, img):
 
 def run_preprocessing(dataset_path):
 
-    sub_folders = os.walk(dataset_path)
+    #sub_folders = os.walk(dataset_path)
+    sub_folders = os.listdir(dataset_path)
+    
     for i in sub_folders:
         print(i[0])
 
