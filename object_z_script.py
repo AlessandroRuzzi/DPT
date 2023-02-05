@@ -114,8 +114,7 @@ def run_preprocessing(dataset_path):
             if time != "info.json":
                 curr_time_folder_path = os.path.join(curr_folder_path, time)
                 
-                """
-                cam_ext = cam_cal.get_cal(day)
+                
 
                 torch.backends.cudnn.enabled = True
                 torch.backends.cudnn.benchmark = True
@@ -127,24 +126,17 @@ def run_preprocessing(dataset_path):
                     "dpt_large",
                     True,
                 )
-                """
 
                 for kid in kid_list:
 
-                    h5_file = h5py.File(os.path.join(curr_time_folder_path,f"{object_name}/fit01/{object_name}_fit_k{kid}_sdf.h5"), 'r')
-
                     cam_ext = json.load(open(os.path.join(calibs_path, f"Date0{day}/config/{kid}/config.json")))
-                    print(cam_ext)
-                    print(cam_ext["translation"])
-                    print(cam_ext["rotation"])
-                    continue
+
                     # SMPL parameters
-                    
                     
                     outputs, human_center,human_corners, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"), img_size=1280)
 
-                    #images = wandb.Image(outputs[:, :, ::-1], caption="Image with predicted bounding boxes")
-                    #wandb.log({"Image YOLOv6" : images})
+                    images = wandb.Image(outputs[:, :, ::-1], caption="Image with predicted bounding boxes")
+                    wandb.log({"Image YOLOv6" : images})
 
                     x_pers_pos = [human_corners[0],human_corners[2]]
                     y_pers_pos = [human_corners[1],human_corners[3]]
@@ -152,29 +144,25 @@ def run_preprocessing(dataset_path):
                     y_obj_pos = [object_center[0][1],object_center[2][1],object_center[2][3]]
 
                     
-                    #output = joblib.load('t0021.000/person/fit02/person_fit.pkl') 
-                    #print(output.keys())
-                    smpl = get_smplh([f't00{time_frame}.000/person/fit02/person_fit.pkl'],"male" , "cpu")
+                    smpl = get_smplh([os.path.join(curr_time_folder_path ,'person/fit02/person_fit.pkl')], "female" , "cpu")
                     verts, jtr, tposed, naked = smpl()
                     jtr = torch.cat((jtr[:, :22], jtr[:, 25:26], jtr[:, 40:41]), dim=1) # (N, 24, 3)
                     jtr = jtr.unsqueeze(1).unsqueeze(1).unsqueeze(1) # (N, 1, 1, 1, J, 3)
                     verts = torch.matmul(verts[0] - torch.Tensor(cam_ext["translation"]).reshape(1,-1,3) , torch.Tensor(cam_ext["rotation"]).reshape(3,3) )
 
-                    #print("JTR : ", jtr)
-                    """
+
 
                     # Camera intrinsic parameters and Visualization
 
-                    behave_verts, faces_idx = load_ply(f"t00{time_frame}.000/person/fit02/person_fit.ply")
-                    im = cv2.imread(f"input/k{kid}.color.jpg")
-                    behave_verts = behave_verts.reshape(-1, 3)
+                    #behave_verts, faces_idx = load_ply(f"t00{time_frame}.000/person/fit02/person_fit.ply")
+                    #im = cv2.imread(f"input/k{kid}.color.jpg")
+                    #behave_verts = behave_verts.reshape(-1, 3)
                     #intrinsics = [bcu.load_intrinsics("t0021.000/calibs/intrinsics", i) for i in range(4)]
-                    intrinsics_2 = [load_intrinsics(os.path.join("t0021.000/calibs", "intrinsics"), i) for i in range(4)]
-                    calibration_matrix = intrinsics_2[kid][0]
-                    dist_coefs = intrinsics_2[kid][1]
-                    #print(calibration_matrix.shape, dist_coefs.shape)
-                    projector = get_local_projector(calibration_matrix, dist_coefs)
-                    show_projection(torch.from_numpy(projector(verts[0].detach().cpu().numpy())), im[:,:,::-1].copy())
+                    #intrinsics_2 = [load_intrinsics(os.path.join("t0021.000/calibs", "intrinsics"), i) for i in range(4)]
+                    #calibration_matrix = intrinsics_2[kid][0]
+                    #dist_coefs = intrinsics_2[kid][1]
+                    #projector = get_local_projector(calibration_matrix, dist_coefs)
+                    #show_projection(torch.from_numpy(projector(verts[0].detach().cpu().numpy())), im[:,:,::-1].copy())
 
                     #print(torch.max(verts[0,:,2]))
                     #print(torch.min(verts[0,:,2]))
@@ -198,16 +186,18 @@ def run_preprocessing(dataset_path):
                     obj_dim = bbox[3]
                     print("GT Object z mean position --> ", gt_obj_z)
 
+                    
+
                     img = Image.open(f"input/k{kid}.color.jpg")
                     convert_tensor = transforms.ToTensor()
                     img_tensor = (convert_tensor(img).float() * 255).int()
 
-                    mask_person = Image.open(f"t00{time_frame}.000/k{kid}.person_mask.jpg")
+                    mask_person = Image.open(os.path.join(curr_time_folder_path,f"k{kid}.person_mask.jpg"))
                     mask_tensor_p = convert_tensor(mask_person) > 0.5
                     #print(mask_tensor_p.shape)
                     #print(torch.unique(mask_tensor_p))
 
-                    mask_object = Image.open(f"t00{time_frame}.000/k{kid}.obj_rend_mask.jpg")
+                    mask_object = Image.open(os.path.join(curr_time_folder_path,f"k{kid}.obj_rend_mask.jpg"))
                     mask_tensor_o = convert_tensor(mask_object) > 0.5
                     #print(mask_tensor_o.shape)
                     #print(torch.unique(mask_tensor_o))
@@ -259,24 +249,24 @@ def run_preprocessing(dataset_path):
                     print("Lenght Percentage Error between GT and Pred:", (abs((abs(lenght - obj_dim))/obj_dim)) * 100.0)
 
 
-                    img = Image.fromarray((img_tensor[0].numpy() * 255).astype(np.uint8))
+                    #img = Image.fromarray((img_tensor[0].numpy() * 255).astype(np.uint8))
 
                     #print(torch.unique(img_tensor))
                     #print(len(torch.unique(img_tensor)))
 
                     #img.show()
 
-                    img = Image.open(f"t00{time_frame}.000/k2.depth.png")
+                    #img = Image.open(f"t00{time_frame}.000/k2.depth.png")
 
                     #img.show()
 
-                    convert_tensor = transforms.ToTensor()
+                    #convert_tensor = transforms.ToTensor()
 
-                    img_tensor = convert_tensor(img)
+                    #img_tensor = convert_tensor(img)
 
                     #print(torch.unique(img_tensor))
                     #print(len(torch.unique(img_tensor)))
-                    """
+
                 break
         break
 
