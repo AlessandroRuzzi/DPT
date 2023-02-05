@@ -239,7 +239,7 @@ def run_preprocessing(dataset_path):
                 print("Z Error: ", error_dict['z'] / error_dict['num_imgs'])
                 print("Z_optional Error: ", error_dict['z_optional'] / error_dict['num_imgs'])
                 print("Lenght Error: ", error_dict['l'] / error_dict['num_imgs'])
-                print("-------------------------------------")
+                print("-------------------------------------\n")
                 
 
                 #break
