@@ -274,7 +274,7 @@ def run_preprocessing(dataset_path):
                     #print(len(torch.unique(img_tensor)))
                     """
                 break
-            break
+        break
 
 if __name__ == "__main__":
 
