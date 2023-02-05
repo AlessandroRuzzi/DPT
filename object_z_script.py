@@ -89,7 +89,7 @@ def run_preprocessing(dataset_path):
     sub_folders = os.listdir(dataset_path)
     
     for i in sub_folders:
-        print(i[0])
+        print(i)
 
     """
     kid_list = [0,1,2,3]
