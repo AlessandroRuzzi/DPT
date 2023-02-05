@@ -257,7 +257,7 @@ def run_preprocessing(dataset_path):
     #print(len(torch.unique(img_tensor)))
     """
 
-if __name__ == "main":
+if __name__ == "__main__":
 
     dataset_path = "/data/xiwang/Behave/sequences/"
     run_preprocessing(dataset_path)
