@@ -90,7 +90,9 @@ def show_projection(ver, img):
 def run_preprocessing(dataset_path):
 
     #sub_folders = os.walk(dataset_path)
-    sub_folders = os.listdir(dataset_path)
+    sequences_path = os.path.join(dataset_path,"sequences")
+    calibs_path = os.path.join(dataset_path,"calibs")
+    sub_folders = os.listdir(sequences_path)
     sub_folders.sort()
 
     kid_list = [0,1,2,3]
@@ -129,7 +131,9 @@ def run_preprocessing(dataset_path):
 
                 for kid in kid_list:
 
-                    cam_ext = json.load(open(os.path.join(dataset_path, f"calibs/Date0{day}/config/{kid}/config.json")))
+                    h5_file = h5py.File(os.path.join(curr_time_folder_path,f"{object_name}/fit01/{object_name}_fit_k{kid}_sdf.h5"), 'r')
+
+                    cam_ext = json.load(open(os.path.join(dataset_path, f"Date0{day}/config/{kid}/config.json")))
                     print(cam_ext)
                     print(cam_ext["translation"])
                     print(cam_ext["rotation"])
@@ -278,5 +282,5 @@ def run_preprocessing(dataset_path):
 
 if __name__ == "__main__":
 
-    dataset_path = "/data/xiwang/behave/sequences/"
+    dataset_path = "/data/xiwang/behave"
     run_preprocessing(dataset_path)
