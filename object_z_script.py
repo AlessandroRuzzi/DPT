@@ -104,6 +104,7 @@ def run_preprocessing(dataset_path):
         day = int(strtok[0][-2:])
         object_name = object_name_dict[strtok[2]]
         print(day,object_name)
+        print(curr_folder_path)
 
         time_folders = os.listdir(curr_folder_path)
         time_folders.sort()
