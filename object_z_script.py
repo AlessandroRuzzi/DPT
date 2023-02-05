@@ -129,33 +129,35 @@ def run_preprocessing(dataset_path):
 
                 for kid in kid_list:
 
-                    h5_file = h5py.File(os.path.join(curr_time_folder_path,f"{object_name}/fit01/{object_name}_fit_k{kid}_sdf.h5"), 'r')
-
+                    cam_ext = json.load(os.path.join(dataset_path, f"calibs/Date0{day}/config/{kid}/config.json"))
+                    print(cam_ext)
+                    print(cam_ext["translation"])
+                    print(cam_ext["rotation"])
+                    continue
                     # SMPL parameters
-                    """
-                    outputs, human_center,human_corners, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=f"t00{time_frame}.000/k{kid}.color.jpg", img_size=1280)
+                    
+                    
+                    outputs, human_center,human_corners, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"), img_size=1280)
 
-                    images = wandb.Image(outputs[:, :, ::-1], caption="Image with predicted bounding boxes")
-                    wandb.log({"Image YOLOv6" : images})
+                    #images = wandb.Image(outputs[:, :, ::-1], caption="Image with predicted bounding boxes")
+                    #wandb.log({"Image YOLOv6" : images})
 
                     x_pers_pos = [human_corners[0],human_corners[2]]
                     y_pers_pos = [human_corners[1],human_corners[3]]
                     x_obj_pos =  [object_center[0][0],object_center[2][0],object_center[2][2]]
                     y_obj_pos = [object_center[0][1],object_center[2][1],object_center[2][3]]
 
-                    #print(y_pers_pos)
-                    #print(y_obj_pos)
-
+                    
                     #output = joblib.load('t0021.000/person/fit02/person_fit.pkl') 
                     #print(output.keys())
                     smpl = get_smplh([f't00{time_frame}.000/person/fit02/person_fit.pkl'],"male" , "cpu")
                     verts, jtr, tposed, naked = smpl()
                     jtr = torch.cat((jtr[:, :22], jtr[:, 25:26], jtr[:, 40:41]), dim=1) # (N, 24, 3)
                     jtr = jtr.unsqueeze(1).unsqueeze(1).unsqueeze(1) # (N, 1, 1, 1, J, 3)
-                    verts = torch.matmul(verts[0] - torch.Tensor(cam_ext[kid]["translation"]).reshape(1,-1,3) , torch.Tensor(cam_ext[kid]["rotation"]).reshape(3,3) )
+                    verts = torch.matmul(verts[0] - torch.Tensor(cam_ext["translation"]).reshape(1,-1,3) , torch.Tensor(cam_ext["rotation"]).reshape(3,3) )
 
                     #print("JTR : ", jtr)
-
+                    """
 
                     # Camera intrinsic parameters and Visualization
 
@@ -175,7 +177,7 @@ def run_preprocessing(dataset_path):
                     gt_per_z = torch.min(verts[0,:,2]) + (torch.max(verts[0,:,2]) - torch.min(verts[0,:,2])) / 2.0
                     print("GT Person z mean position --> ", gt_per_z)
 
-                    h5_file = h5py.File(f"t00{time_frame}.000/{object_name}/fit01/{object_name}_fit_k{kid}_sdf.h5", 'r')
+                    h5_file = h5py.File(os.path.join(curr_time_folder_path,f"{object_name}/fit01/{object_name}_fit_k{kid}_sdf.h5"), 'r')
                     norm_params = h5_file['norm_params'][:].astype(np.float32)
                     bbox = h5_file['sdf_params'][:].astype(np.float32)
                     norm_params = torch.Tensor(norm_params)
@@ -271,6 +273,8 @@ def run_preprocessing(dataset_path):
                     #print(torch.unique(img_tensor))
                     #print(len(torch.unique(img_tensor)))
                     """
+                break
+            break
 
 if __name__ == "__main__":
 
