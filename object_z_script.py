@@ -297,7 +297,7 @@ def run_preprocessing(dataset_path):
                     mask_tensor_o = convert_tensor(mask_object) > 0.5
 
 
-                    img = Image.open(f"output_monodepth/k{kid}.color.png")
+                    img = Image.open(f"output_monodepth_2/k{kid}.color.png")
 
 
                     img_tensor = convert_tensor(img).float()
