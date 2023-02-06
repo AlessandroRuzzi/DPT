@@ -16,10 +16,9 @@ import os
 from yolov6.infer import run as run_inference
 from run_monodepth import run
 import wandb
-from day_calibs import Cam_Cal
+import random
 
 wandb.init(project = "Bounding Boxes detection")
-cam_cal = Cam_Cal()
 
 object_name_dict = {'backpack' : 'backpack', 'basketball' : 'sports ball', 'boxlarge' : 'boxlarge', 'boxlong' : 'boxlong', 'boxmedium' : 'boxmedium','boxsmall' : 'boxsmall',
                      'boxtiny' :'boxtiny' , 'chairblack' : 'chair','chairwood' : 'chair', 'keyboard' : 'keyboard' , 'monitor' : 'monitor', 'plasticcontainer': 'plasticcontainer', 
@@ -116,7 +115,7 @@ def run_preprocessing(dataset_path):
                 
                 
 
-                torch.backends.cudnn.enabled = True
+                
                 torch.backends.cudnn.benchmark = True
                 # compute depth maps
                 run(
@@ -246,6 +245,21 @@ def run_preprocessing(dataset_path):
         #break
 
 if __name__ == "__main__":
+
+    torch.autograd.set_detect_anomaly(True)
+    torch.manual_seed(45)  # cpu
+    torch.cuda.manual_seed(55)  # gpu
+    np.random.seed(65)  # numpy
+    random.seed(75)  # random and transforms
+    torch.backends.cudnn.enabled = True
+    torch.backends.cudnn.deterministic = True  # cudnn
+    torch.backends.cudnn.benchmark = True
+    torch.backends.cuda.matmul.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
+
+    os.environ["OMP_NUM_THREADS"] = "1"
+    os.environ["MKL_NUM_THREADS"] = "1"
+    torch.set_num_threads(1)
 
     dataset_path = "/data/xiwang/behave"
     run_preprocessing(dataset_path)
