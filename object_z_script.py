@@ -220,6 +220,7 @@ def run_preprocessing(dataset_path):
                     cam_ext = json.load(open(os.path.join(calibs_path, f"Date0{day}/config/{kid}/config.json")))
 
                     # SMPL parameters
+                    """
                     im = cv2.imread(os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"))
                     outputs = predictor(im)
                     human_center,human_corners, object_center = calc_near_bbox(outputs["instances"].pred_classes, outputs["instances"].pred_boxes, outputs["instances"].scores)
@@ -234,8 +235,8 @@ def run_preprocessing(dataset_path):
                     #images = wandb.Image(out.get_image()[:, :, ::-1], caption="Image with predicted bounding boxes")
                     images = wandb.Image(out[:, :, ::-1], caption="Image with predicted bounding boxes")
                     wandb.log({"Image Detectron2" : images})
-                    
-                    #outputs, human_center,human_corners, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"), img_size=1280)
+                    """
+                    outputs, human_center,human_corners, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"), img_size=1280)
 
                     
                     #images = wandb.Image(outputs[:, :, ::-1], caption="Image with predicted bounding boxes")
