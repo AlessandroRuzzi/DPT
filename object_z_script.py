@@ -84,7 +84,8 @@ def show_projection(ver, img):
     #print(ver)
     for i in range(ver.shape[0]):
         img = cv2.circle(img, (ver[i, 0].int().item(), ver[i, 1].int().item()), 2, (255, 0, 0), 1)
-    show(img)
+    images = wandb.Image(img[:, :, ::-1], caption="Image with SMPL predictions")
+    wandb.log({"Image SMPL" : images})
 
 def run_preprocessing(dataset_path):
 
@@ -154,14 +155,14 @@ def run_preprocessing(dataset_path):
                     # Camera intrinsic parameters and Visualization
 
                     #behave_verts, faces_idx = load_ply(f"t00{time_frame}.000/person/fit02/person_fit.ply")
-                    #im = cv2.imread(f"input/k{kid}.color.jpg")
+                    im = cv2.imread(os.path.join(curr_time_folder_path ,f"k{kid}.color.jpg"))
                     #behave_verts = behave_verts.reshape(-1, 3)
-                    #intrinsics = [bcu.load_intrinsics("t0021.000/calibs/intrinsics", i) for i in range(4)]
-                    #intrinsics_2 = [load_intrinsics(os.path.join("t0021.000/calibs", "intrinsics"), i) for i in range(4)]
-                    #calibration_matrix = intrinsics_2[kid][0]
-                    #dist_coefs = intrinsics_2[kid][1]
-                    #projector = get_local_projector(calibration_matrix, dist_coefs)
-                    #show_projection(torch.from_numpy(projector(verts[0].detach().cpu().numpy())), im[:,:,::-1].copy())
+                    intrinsics = [bcu.load_intrinsics("t0021.000/calibs/intrinsics", i) for i in range(4)]
+                    intrinsics_2 = [load_intrinsics(os.path.join("t0021.000/calibs", "intrinsics"), i) for i in range(4)]
+                    calibration_matrix = intrinsics_2[kid][0]
+                    dist_coefs = intrinsics_2[kid][1]
+                    projector = get_local_projector(calibration_matrix, dist_coefs)
+                    show_projection(torch.from_numpy(projector(verts[0].detach().cpu().numpy())), im[:,:,::-1].copy())
 
                     gt_per_z = torch.min(verts[0,:,2]) + (torch.max(verts[0,:,2]) - torch.min(verts[0,:,2])) / 2.0
                     #print("GT Person z mean position --> ", gt_per_z)
@@ -182,11 +183,6 @@ def run_preprocessing(dataset_path):
                     obj_dim = bbox[3]
                     #print("GT Object z mean position --> ", gt_obj_z)
 
-                    
-
-                    img = Image.open(f"input/k{kid}.color.jpg")
-                    convert_tensor = transforms.ToTensor()
-                    img_tensor = (convert_tensor(img).float() * 255).int()
 
                     mask_person = Image.open(os.path.join(curr_time_folder_path,f"k{kid}.person_mask.jpg"))
                     mask_tensor_p = convert_tensor(mask_person) > 0.5

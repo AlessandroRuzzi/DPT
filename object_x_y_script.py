@@ -20,7 +20,7 @@ wandb.init(project = "Bounding Boxes detection")
 #cv2.imshow("Original Image",im)
 
 # Predict Bounding Box
-"""
+
 cfg = get_cfg()
 # add project-specific config (e.g., TensorMask) here if you're not running a model in detectron2's core library
 cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
@@ -45,7 +45,7 @@ for i in range(4):
 
     images = wandb.Image(out.get_image()[:, :, ::-1], caption="Image with predicted bounding boxes")
     wandb.log({"Image Detectron2" : images})
-"""
+
 
 for i in range(4):
     #im = cv2.imread(f"input/k{i}.color.jpg")
