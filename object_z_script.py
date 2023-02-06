@@ -236,7 +236,7 @@ def run_preprocessing(dataset_path):
                     images = wandb.Image(out[:, :, ::-1], caption="Image with predicted bounding boxes")
                     wandb.log({"Image Detectron2" : images})
                     """
-                    outputs, human_center,human_corners, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"), img_size=1280)
+                    outputs, human_center,human_corners, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"), img_size=1280, conf_thres=0.3)
 
                     
                     #images = wandb.Image(outputs[:, :, ::-1], caption="Image with predicted bounding boxes")
