@@ -29,7 +29,7 @@ wandb.init(project = "Bounding Boxes detection")
 cfg = get_cfg()
 # add project-specific config (e.g., TensorMask) here if you're not running a model in detectron2's core library
 cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
-cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.05  # set threshold for this model
+cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.1  # set threshold for this model
 # Find a model from detectron2's model zoo. You can use the https://dl.fbaipublicfiles... url as well
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
 predictor = DefaultPredictor(cfg)
@@ -151,7 +151,7 @@ def get_iou(bb1, bb2):
     assert iou <= 1.0
     return iou
 
-def calc_near_bbox(classes, boxes):
+def calc_near_bbox(classes, boxes, scores):
     object_center_list = []
     object_dist_list = []
     human_center = []
@@ -162,10 +162,10 @@ def calc_near_bbox(classes, boxes):
             human_center = [(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3])/2]
             human_corners = xyxy
         else:
-            object_center_list.append(([(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3])/2], elem, xyxy))
+            object_center_list.append(([(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3])/2], scores[i], xyxy))
 
     for i, center in enumerate(object_center_list):
-        object_dist_list.append(get_iou(human_corners, center[2]))
+        object_dist_list.append(get_iou(human_corners, center[2]) + center[1])
 
     if len(object_dist_list) != 0:
             pos, element = max(enumerate(object_dist_list), key=itemgetter(1))
@@ -222,7 +222,7 @@ def run_preprocessing(dataset_path):
                     # SMPL parameters
                     im = cv2.imread(os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"))
                     outputs = predictor(im)
-                    human_center,human_corners, object_center = calc_near_bbox(outputs["instances"].pred_classes, outputs["instances"].pred_boxes)
+                    human_center,human_corners, object_center = calc_near_bbox(outputs["instances"].pred_classes, outputs["instances"].pred_boxes, outputs["instances"].scores)
                     #print(outputs["instances"])
                     #print(outputs["instances"].pred_classes)
                     #print(outputs["instances"].pred_boxes)
