@@ -209,7 +209,7 @@ def run_preprocessing(dataset_path):
                 # compute depth maps
                 run(
                     curr_time_folder_path,
-                    "output_monodepth",
+                    "output_monodepth_2",
                     "weights/dpt_large-midas-2f21e586.pt",
                     "dpt_large",
                     True,
