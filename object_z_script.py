@@ -22,6 +22,7 @@ from detectron2.engine import DefaultPredictor
 from detectron2.config import get_cfg
 from detectron2.utils.visualizer import Visualizer
 from detectron2.data import MetadataCatalog, DatasetCatalog
+from operator import itemgetter
 
 wandb.init(project = "Bounding Boxes detection")
 
@@ -97,8 +98,80 @@ def show_projection(ver, img):
     #print(ver)
     for i in range(ver.shape[0]):
         img = cv2.circle(img, (ver[i, 0].int().item(), ver[i, 1].int().item()), 2, (255, 0, 0), 1)
-    images = wandb.Image(img[:, :, ::-1], caption="Image with SMPL predictions")
+    images = wandb.Image(img, caption="Image with SMPL predictions")
     wandb.log({"Image SMPL" : images})
+
+def get_iou(bb1, bb2):
+    """
+    Calculate the Intersection over Union (IoU) of two bounding boxes.
+
+    Parameters
+    ----------
+    bb1 : dict
+        Keys: {'x1', 'x2', 'y1', 'y2'}
+        The (x1, y1) position is at the top left corner,
+        the (x2, y2) position is at the bottom right corner
+    bb2 : dict
+        Keys: {'x1', 'x2', 'y1', 'y2'}
+        The (x, y) position is at the top left corner,
+        the (x2, y2) position is at the bottom right corner
+
+    Returns
+    -------
+    float
+        in [0, 1]
+    """
+    assert bb1[0] < bb1[2]
+    assert bb1[1] < bb1[3]
+    assert bb2[0] < bb2[2]
+    assert bb2[1] < bb2[3]
+
+    # determine the coordinates of the intersection rectangle
+    x_left = max(bb1[0], bb2[0])
+    y_top = max(bb1[1], bb2[1])
+    x_right = min(bb1[2], bb2[2])
+    y_bottom = min(bb1[3], bb2[3])
+
+    if x_right < x_left or y_bottom < y_top:
+        return 0.0
+
+    # The intersection of two axis-aligned bounding boxes is always an
+    # axis-aligned bounding box
+    intersection_area = (x_right - x_left) * (y_bottom - y_top)
+
+    # compute the area of both AABBs
+    bb1_area = (bb1[2] - bb1[0]) * (bb1[3] - bb1[1])
+    bb2_area = (bb2[2] - bb2[0]) * (bb2[3] - bb2[1])
+
+    # compute the intersection over union by taking the intersection
+    # area and dividing it by the sum of prediction + ground-truth
+    # areas - the interesection area
+    iou = intersection_area / float(bb1_area + bb2_area - intersection_area)
+    assert iou >= 0.0
+    assert iou <= 1.0
+    return iou
+
+def calc_near_bbox(classes, boxes):
+    object_center_list = []
+    object_dist_list = []
+    human_center = []
+    for i, elem in enumerate(classes):
+        xyxy = boxes[i]
+        if elem == 0 and len(human_center) == 0:
+            human_center = [(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3])/2]
+            human_corners = xyxy
+        else:
+            object_center_list.append(([(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3])/2], elem, xyxy))
+
+        for i, center in enumerate(object_center_list):
+            object_dist_list.append(get_iou(human_corners, center[2]))
+
+    if len(object_dist_list) != 0:
+            pos, element = max(enumerate(object_dist_list), key=itemgetter(1))
+            return human_center, human_corners, object_center_list[pos]
+    else:
+            return human_center, human_corners, (human_center, "human", human_corners)
+
 
 def run_preprocessing(dataset_path):
 
@@ -148,9 +221,9 @@ def run_preprocessing(dataset_path):
                     im = cv2.imread(os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"))
                     outputs = predictor(im)
 
-                    print(outputs["instances"])
-                    print(outputs["instances"].pred_classes)
-                    print(outputs["instances"].pred_boxes)
+                    #print(outputs["instances"])
+                    #print(outputs["instances"].pred_classes)
+                    #print(outputs["instances"].pred_boxes)
 
                     v = Visualizer(im[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
                     out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
@@ -159,8 +232,9 @@ def run_preprocessing(dataset_path):
                     images = wandb.Image(out.get_image()[:, :, ::-1], caption="Image with predicted bounding boxes")
                     wandb.log({"Image Detectron2" : images})
                     
-                    outputs, human_center,human_corners, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"), img_size=1280)
+                    #outputs, human_center,human_corners, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"), img_size=1280)
 
+                    human_center,human_corners, object_center = calc_near_bbox(outputs["instances"].pred_classes, outputs["instances"].pred_boxes)
                     #images = wandb.Image(outputs[:, :, ::-1], caption="Image with predicted bounding boxes")
                     #wandb.log({"Image YOLOv6" : images})
 
