@@ -29,7 +29,7 @@ wandb.init(project = "Bounding Boxes detection")
 cfg = get_cfg()
 # add project-specific config (e.g., TensorMask) here if you're not running a model in detectron2's core library
 cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
-cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.45  # set threshold for this model
+cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.10  # set threshold for this model
 # Find a model from detectron2's model zoo. You can use the https://dl.fbaipublicfiles... url as well
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
 predictor = DefaultPredictor(cfg)
@@ -308,6 +308,8 @@ def run_preprocessing(dataset_path):
                     pred_obj_z_ref, lenght = calc_lenght(img_tensor, verts, mask_tensor_p, mask_tensor_o, x_pers_pos, x_obj_pos, y_pers_pos, y_obj_pos, pred_obj_z, obj_dim )
                     #pred_obj_z = ((torch.mean(img_tensor[0,x_pers_pos[0].int(): x_pers_pos[1].int(),y_pers_pos[0].int(): y_pers_pos[1].int()])) * (torch.min(verts[0,:,2]) + (torch.max(verts[0,:,2]) - torch.min(verts[0,:,2])) / 2.0)) / (torch.mean(img_tensor[0,object_center[2][0].int():object_center[2][2].int(),object_center[2][1].int():object_center[2][3].int()]))
                     
+                    gt_obj_x *= -1
+                    gt_obj_y *= -1
                     error_dict['x'] += (abs((abs(pred_obj_x-gt_obj_x))/obj_dim)) * 100.0
                     error_dict['y'] += (abs((abs(pred_obj_y-gt_obj_y))/obj_dim)) * 100.0
                     error_dict['z'] += (abs((abs(pred_obj_z-gt_obj_z))/obj_dim)) * 100.0
@@ -330,6 +332,7 @@ def run_preprocessing(dataset_path):
                     print("Z Percentage Error between GT and Pred:", (abs((abs(pred_obj_z-gt_obj_z))/obj_dim)) * 100.0)
                     print("Lenght Percentage Error between GT and Pred:", (abs((abs(lenght - obj_dim))/obj_dim)) * 100.0)
                     """
+                    
                 print("-------------------------------------")
                 print("X Error: ", error_dict['x'] / error_dict['num_imgs'])
                 print("Y Error: ", error_dict['y'] / error_dict['num_imgs'])
