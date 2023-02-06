@@ -29,7 +29,7 @@ wandb.init(project = "Bounding Boxes detection")
 cfg = get_cfg()
 # add project-specific config (e.g., TensorMask) here if you're not running a model in detectron2's core library
 cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
-cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.60  # set threshold for this model
+cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.45  # set threshold for this model
 # Find a model from detectron2's model zoo. You can use the https://dl.fbaipublicfiles... url as well
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
 predictor = DefaultPredictor(cfg)
@@ -222,21 +222,21 @@ def run_preprocessing(dataset_path):
                     # SMPL parameters
                     im = cv2.imread(os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"))
                     outputs = predictor(im)
-
+                    human_center,human_corners, object_center = calc_near_bbox(outputs["instances"].pred_classes, outputs["instances"].pred_boxes)
                     #print(outputs["instances"])
                     #print(outputs["instances"].pred_classes)
                     #print(outputs["instances"].pred_boxes)
 
                     v = Visualizer(im[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
-                    out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+                    #out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
 
-
+                    out = cv2.rectangle(img, (object_center[2][0], object_center[2][1]), (object_center[2][2], object_center[2][3]), (255,0,0), 2)
                     images = wandb.Image(out.get_image()[:, :, ::-1], caption="Image with predicted bounding boxes")
                     wandb.log({"Image Detectron2" : images})
                     
                     #outputs, human_center,human_corners, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"), img_size=1280)
 
-                    human_center,human_corners, object_center = calc_near_bbox(outputs["instances"].pred_classes, outputs["instances"].pred_boxes)
+                    
                     #images = wandb.Image(outputs[:, :, ::-1], caption="Image with predicted bounding boxes")
                     #wandb.log({"Image YOLOv6" : images})
 
@@ -246,7 +246,7 @@ def run_preprocessing(dataset_path):
                     y_obj_pos = [object_center[0][1],object_center[2][1],object_center[2][3]]
 
                     
-                    smpl = get_smplh([os.path.join(curr_time_folder_path ,'person/fit02/person_fit.pkl')], "female" , "cpu")
+                    smpl = get_smplh([os.path.join(curr_time_folder_path ,'person/fit02/person_fit.pkl')], "male" , "cpu")
                     verts, jtr, tposed, naked = smpl()
                     jtr = torch.cat((jtr[:, :22], jtr[:, 25:26], jtr[:, 40:41]), dim=1) # (N, 24, 3)
                     jtr = jtr.unsqueeze(1).unsqueeze(1).unsqueeze(1) # (N, 1, 1, 1, J, 3)
