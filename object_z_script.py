@@ -183,6 +183,7 @@ def run_preprocessing(dataset_path):
                     obj_dim = bbox[3]
                     #print("GT Object z mean position --> ", gt_obj_z)
 
+                    convert_tensor = transforms.ToTensor()
 
                     mask_person = Image.open(os.path.join(curr_time_folder_path,f"k{kid}.person_mask.jpg"))
                     mask_tensor_p = convert_tensor(mask_person) > 0.5
@@ -194,8 +195,6 @@ def run_preprocessing(dataset_path):
 
                     img = Image.open(f"output_monodepth/k{kid}.color.png")
 
-
-                    convert_tensor = transforms.ToTensor()
 
                     img_tensor = convert_tensor(img).float()
 
