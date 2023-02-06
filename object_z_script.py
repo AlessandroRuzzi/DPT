@@ -293,12 +293,12 @@ def run_preprocessing(dataset_path):
 
                     mask_person = Image.open(os.path.join(curr_time_folder_path,f"k{kid}.person_mask.jpg"))
                     mask_tensor_p = convert_tensor(mask_person) > 0.5
-                    mask_tensor_p = human_mask
+                    mask_tensor_p = torch.reshape(human_mask, (1,1536,2048))
 
 
                     mask_object = Image.open(os.path.join(curr_time_folder_path,f"k{kid}.obj_rend_mask.jpg"))
                     mask_tensor_o = convert_tensor(mask_object) > 0.5
-                    mask_tensor_o = object_center[3]
+                    mask_tensor_o = torch.reshape(object_center[3], (1,1536,2048))
 
 
                     img = Image.open(f"output_monodepth/k{kid}.color.png")
