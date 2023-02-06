@@ -165,7 +165,7 @@ def calc_near_bbox(classes, boxes, scores):
             object_center_list.append(([(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3])/2], scores[i], xyxy))
 
     for i, center in enumerate(object_center_list):
-        object_dist_list.append(get_iou(human_corners, center[2]) + center[1] * 0.1)
+        object_dist_list.append(get_iou(human_corners, center[2]))
 
     if len(object_dist_list) != 0:
             pos, element = max(enumerate(object_dist_list), key=itemgetter(1))
