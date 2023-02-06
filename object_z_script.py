@@ -156,7 +156,7 @@ def calc_near_bbox(classes, boxes):
     object_dist_list = []
     human_center = []
     for i, elem in enumerate(classes):
-        xyxy = boxes[0][i]
+        xyxy = boxes["Boxes"][i]
         print(xyxy)
         if elem == 0 and len(human_center) == 0:
             human_center = [(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3])/2]
