@@ -164,14 +164,12 @@ def calc_near_bbox(classes, boxes):
         else:
             object_center_list.append(([(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3])/2], elem, xyxy))
 
-        for i, center in enumerate(object_center_list):
-            object_dist_list.append(get_iou(human_corners, center[2]))
+    for i, center in enumerate(object_center_list):
+        object_dist_list.append(get_iou(human_corners, center[2]))
 
     if len(object_dist_list) != 0:
             pos, element = max(enumerate(object_dist_list), key=itemgetter(1))
-            print(pos)
-            print(len(object_dist_list))
-            print(len(object_center_list))
+
             return human_center, human_corners, object_center_list[pos]
     else:
             return human_center, human_corners, (human_center, "human", human_corners)
