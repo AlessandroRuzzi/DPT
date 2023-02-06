@@ -169,6 +169,9 @@ def calc_near_bbox(classes, boxes):
 
     if len(object_dist_list) != 0:
             pos, element = max(enumerate(object_dist_list), key=itemgetter(1))
+            print(pos)
+            print(len(object_dist_list))
+            print(len(object_center_list))
             return human_center, human_corners, object_center_list[pos]
     else:
             return human_center, human_corners, (human_center, "human", human_corners)
