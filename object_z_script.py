@@ -29,7 +29,7 @@ wandb.init(project = "Bounding Boxes detection")
 cfg = get_cfg()
 # add project-specific config (e.g., TensorMask) here if you're not running a model in detectron2's core library
 cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
-cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.10  # set threshold for this model
+cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.30  # set threshold for this model
 # Find a model from detectron2's model zoo. You can use the https://dl.fbaipublicfiles... url as well
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
 predictor = DefaultPredictor(cfg)
@@ -232,7 +232,7 @@ def run_preprocessing(dataset_path):
 
                     out = cv2.rectangle(im, (int(object_center[2][0]), int(object_center[2][1])), (int(object_center[2][2]), int(object_center[2][3])), (255,0,0), 2)
                     #images = wandb.Image(out.get_image()[:, :, ::-1], caption="Image with predicted bounding boxes")
-                    images = wandb.Image(out, caption="Image with predicted bounding boxes")
+                    images = wandb.Image(out[:, :, ::-1], caption="Image with predicted bounding boxes")
                     wandb.log({"Image Detectron2" : images})
                     
                     #outputs, human_center,human_corners, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"), img_size=1280)
