@@ -231,7 +231,8 @@ def run_preprocessing(dataset_path):
                     #out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
 
                     out = cv2.rectangle(im, (int(object_center[2][0]), int(object_center[2][1])), (int(object_center[2][2]), int(object_center[2][3])), (255,0,0), 2)
-                    images = wandb.Image(out.get_image()[:, :, ::-1], caption="Image with predicted bounding boxes")
+                    #images = wandb.Image(out.get_image()[:, :, ::-1], caption="Image with predicted bounding boxes")
+                    images = wandb.Image(out, caption="Image with predicted bounding boxes")
                     wandb.log({"Image Detectron2" : images})
                     
                     #outputs, human_center,human_corners, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"), img_size=1280)
