@@ -151,18 +151,20 @@ def get_iou(bb1, bb2):
     assert iou <= 1.0
     return iou
 
-def calc_near_bbox(classes, boxes, scores):
+def calc_near_bbox(classes, boxes, scores, masks):
     object_center_list = []
     object_dist_list = []
     human_center = []
+    human_mask = []
     for i, elem in enumerate(classes):
         xyxy = boxes.tensor[i]
 
         if elem == 0 and len(human_center) == 0:
             human_center = [(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3])/2]
             human_corners = xyxy
+            human_mask = masks[i]
         else:
-            object_center_list.append(([(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3])/2], scores[i], xyxy))
+            object_center_list.append(([(xyxy[0]+xyxy[2])/2, (xyxy[1] + xyxy[3])/2], scores[i], xyxy, masks[i]))
 
     for i, center in enumerate(object_center_list):
         object_dist_list.append(get_iou(human_corners, center[2]))
@@ -170,9 +172,9 @@ def calc_near_bbox(classes, boxes, scores):
     if len(object_dist_list) != 0:
             pos, element = max(enumerate(object_dist_list), key=itemgetter(1))
 
-            return human_center, human_corners, object_center_list[pos]
+            return human_center,human_mask, human_corners, object_center_list[pos]
     else:
-            return human_center, human_corners, (human_center, "human", human_corners)
+            return human_center,human_mask, human_corners, (human_center, "human", human_corners, human_mask)
 
 
 def run_preprocessing(dataset_path):
@@ -209,7 +211,7 @@ def run_preprocessing(dataset_path):
                 # compute depth maps
                 run(
                     curr_time_folder_path,
-                    "output_monodepth_2",
+                    "output_monodepth",
                     "weights/dpt_large-midas-2f21e586.pt",
                     "dpt_large",
                     True,
@@ -220,10 +222,10 @@ def run_preprocessing(dataset_path):
                     cam_ext = json.load(open(os.path.join(calibs_path, f"Date0{day}/config/{kid}/config.json")))
 
                     # SMPL parameters
-                    """
+                    
                     im = cv2.imread(os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"))
                     outputs = predictor(im)
-                    human_center,human_corners, object_center = calc_near_bbox(outputs["instances"].pred_classes, outputs["instances"].pred_boxes, outputs["instances"].scores)
+                    human_center,human_mask,human_corners, object_center = calc_near_bbox(outputs["instances"].pred_classes, outputs["instances"].pred_boxes, outputs["instances"].scores, outputs["instances"].pred_masks)
                     #print(outputs["instances"])
                     #print(outputs["instances"].pred_classes)
                     #print(outputs["instances"].pred_boxes)
@@ -235,8 +237,8 @@ def run_preprocessing(dataset_path):
                     #images = wandb.Image(out.get_image()[:, :, ::-1], caption="Image with predicted bounding boxes")
                     images = wandb.Image(out[:, :, ::-1], caption="Image with predicted bounding boxes")
                     wandb.log({"Image Detectron2" : images})
-                    """
-                    outputs, human_center,human_corners, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"), img_size=1280, conf_thres=0.3)
+                    
+                    #outputs, human_center,human_corners, object_center = run_inference(weights="saved_ckpt/yolov6l6.pt", source=os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"), img_size=1280, conf_thres=0.3)
 
                     
                     #images = wandb.Image(outputs[:, :, ::-1], caption="Image with predicted bounding boxes")
@@ -291,13 +293,15 @@ def run_preprocessing(dataset_path):
 
                     mask_person = Image.open(os.path.join(curr_time_folder_path,f"k{kid}.person_mask.jpg"))
                     mask_tensor_p = convert_tensor(mask_person) > 0.5
+                    mask_tensor_p = human_mask
 
 
                     mask_object = Image.open(os.path.join(curr_time_folder_path,f"k{kid}.obj_rend_mask.jpg"))
                     mask_tensor_o = convert_tensor(mask_object) > 0.5
+                    mask_tensor_o = object_center[3]
 
 
-                    img = Image.open(f"output_monodepth_2/k{kid}.color.png")
+                    img = Image.open(f"output_monodepth/k{kid}.color.png")
 
 
                     img_tensor = convert_tensor(img).float()
