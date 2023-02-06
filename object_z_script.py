@@ -230,7 +230,7 @@ def run_preprocessing(dataset_path):
                     v = Visualizer(im[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
                     #out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
 
-                    out = cv2.rectangle(im, (object_center[2][0], object_center[2][1]), (object_center[2][2], object_center[2][3]), (255,0,0), 2)
+                    out = cv2.rectangle(im, (int(object_center[2][0]), int(object_center[2][1])), (int(object_center[2][2]), int(object_center[2][3])), (255,0,0), 2)
                     images = wandb.Image(out.get_image()[:, :, ::-1], caption="Image with predicted bounding boxes")
                     wandb.log({"Image Detectron2" : images})
                     
