@@ -148,6 +148,7 @@ def run_preprocessing(dataset_path):
                     im = cv2.imread(os.path.join(curr_time_folder_path, f"k{kid}.color.jpg"))
                     outputs = predictor(im)
 
+                    print(outputs["instances"])
                     print(outputs["instances"].pred_classes)
                     print(outputs["instances"].pred_boxes)
 
