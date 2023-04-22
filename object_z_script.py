@@ -187,7 +187,7 @@ def run_preprocessing(dataset_path):
     for folder in sub_folders:
     
         curr_folder_path = os.path.join(sequences_path,folder)
-        save_path_root = os.path.join("data/aruzzi/behave_depth/sequences", folder)
+        save_path_root = os.path.join("/data/aruzzi/behave_depth/sequences", folder)
 
         if os.path.exists(save_path_root):
             shutil.rmtree(save_path_root, ignore_errors=True)
@@ -206,7 +206,7 @@ def run_preprocessing(dataset_path):
                 curr_time_folder_path = os.path.join(curr_folder_path, time) 
                 torch.backends.cudnn.benchmark = True
                 print(curr_time_folder_path)
-                save_path_images = os.path.join("data/aruzzi/behave_depth/sequences", folder, time)
+                save_path_images = os.path.join("/data/aruzzi/behave_depth/sequences", folder, time)
                 os.makedirs(save_path_images)
                 break               
                 
