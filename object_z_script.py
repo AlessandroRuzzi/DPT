@@ -23,6 +23,7 @@ from detectron2.config import get_cfg
 from detectron2.utils.visualizer import Visualizer
 from detectron2.data import MetadataCatalog, DatasetCatalog
 from operator import itemgetter
+import shutil
 
 wandb.init(project = "Bounding Boxes detection")
 
@@ -186,6 +187,11 @@ def run_preprocessing(dataset_path):
     for folder in sub_folders:
     
         curr_folder_path = os.path.join(sequences_path,folder)
+        save_path_root = os.path.join("data/aruzzi/behave_depth/sequences", folder)
+
+        if os.path.exists(save_path_root):
+            shutil.rmtree(save_path_root, ignore_errors=True)
+        os.makedirs(save_path_root)
 
         strtok = [str(x) for x in folder.split('_') if x.strip()]
         day = int(strtok[0][-2:])
@@ -198,9 +204,12 @@ def run_preprocessing(dataset_path):
         for time in time_folders:
             if time != "info.json":
                 curr_time_folder_path = os.path.join(curr_folder_path, time) 
-                print(curr_time_folder_path)
-                break               
                 torch.backends.cudnn.benchmark = True
+                print(curr_time_folder_path)
+                save_path_images = os.path.join("data/aruzzi/behave_depth/sequences", folder, time)
+                os.makedirs(save_path_images)
+                break               
+                
 
 
 def run_preprocessing_and_evaluation(dataset_path):
