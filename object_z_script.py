@@ -175,9 +175,35 @@ def calc_near_bbox(classes, boxes, scores, masks):
             return human_center,human_mask, human_corners, object_center_list[pos]
     else:
             return human_center,human_mask, human_corners, (human_center, "human", human_corners, human_mask)
-
-
+    
 def run_preprocessing(dataset_path):
+    sequences_path = os.path.join(dataset_path,"sequences")
+    calibs_path = os.path.join(dataset_path,"calibs")
+    sub_folders = os.listdir(sequences_path)
+    sub_folders.sort()
+    kid_list = [0,1,2,3]
+
+    for folder in sub_folders:
+    
+        curr_folder_path = os.path.join(sequences_path,folder)
+
+        strtok = [str(x) for x in folder.split('_') if x.strip()]
+        day = int(strtok[0][-2:])
+        object_name = object_name_dict[strtok[2]]
+        print(day,object_name)
+
+        time_folders = os.listdir(curr_folder_path)
+        time_folders.sort()
+
+        for time in time_folders:
+            if time != "info.json":
+                curr_time_folder_path = os.path.join(curr_folder_path, time) 
+                print(curr_time_folder_path)
+                break               
+                torch.backends.cudnn.benchmark = True
+
+
+def run_preprocessing_and_evaluation(dataset_path):
 
     #sub_folders = os.walk(dataset_path)
     sequences_path = os.path.join(dataset_path,"sequences")
