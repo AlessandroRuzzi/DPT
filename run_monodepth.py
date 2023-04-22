@@ -171,7 +171,7 @@ def run(input_path, output_path, model_path, model_type="dpt_hybrid", optimize=T
         filename = os.path.join(
             output_path, os.path.splitext(os.path.basename(img_name))[0]
         )
-        util.io.write_depth(filename, prediction, bits=2, absolute_depth=True)
+        util.io.write_depth(filename, prediction, bits=2, absolute_depth=args.absolute_depth)
 
     print("finished")
 

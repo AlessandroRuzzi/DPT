@@ -17,16 +17,12 @@ from yolov6.infer import run as run_inference
 from run_monodepth import run
 import wandb
 import random
-from detectron2 import model_zoo
-from detectron2.engine import DefaultPredictor
-from detectron2.config import get_cfg
-from detectron2.utils.visualizer import Visualizer
-from detectron2.data import MetadataCatalog, DatasetCatalog
 from operator import itemgetter
 import shutil
 
 wandb.init(project = "Bounding Boxes detection")
 
+'''
 cfg = get_cfg()
 # add project-specific config (e.g., TensorMask) here if you're not running a model in detectron2's core library
 cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
@@ -34,7 +30,7 @@ cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  # set threshold for this model
 # Find a model from detectron2's model zoo. You can use the https://dl.fbaipublicfiles... url as well
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
 predictor = DefaultPredictor(cfg)
-
+'''
 object_name_dict = {'backpack' : 'backpack', 'basketball' : 'sports ball', 'boxlarge' : 'boxlarge', 'boxlong' : 'boxlong', 'boxmedium' : 'boxmedium','boxsmall' : 'boxsmall',
                      'boxtiny' :'boxtiny' , 'chairblack' : 'chair','chairwood' : 'chair', 'keyboard' : 'keyboard' , 'monitor' : 'monitor', 'plasticcontainer': 'plasticcontainer', 
                     'stool' : 'stool', 'suitcase': 'suitcase', 'tablesmall' : 'tablesmall', 'tablesquare' : 'tablesquare', 'toolbox' : 'toolbox', 
@@ -179,10 +175,8 @@ def calc_near_bbox(classes, boxes, scores, masks):
     
 def run_preprocessing(dataset_path):
     sequences_path = os.path.join(dataset_path,"sequences")
-    calibs_path = os.path.join(dataset_path,"calibs")
     sub_folders = os.listdir(sequences_path)
     sub_folders.sort()
-    kid_list = [0,1,2,3]
 
     for folder in sub_folders:
     
@@ -392,6 +386,7 @@ def run_preprocessing_and_evaluation(dataset_path):
         #break
 
 if __name__ == "__main__":
+    
 
     torch.autograd.set_detect_anomaly(True)
     torch.manual_seed(45)  # cpu
@@ -407,6 +402,17 @@ if __name__ == "__main__":
     os.environ["OMP_NUM_THREADS"] = "1"
     os.environ["MKL_NUM_THREADS"] = "1"
     torch.set_num_threads(1)
-
+    #"t0013.000_orig",
+    torch.backends.cudnn.benchmark = True
+    '''
+    # compute depth maps
+    run(
+    "t0020.000",
+    "output_monodepth",
+    "weights/dpt_large-midas-2f21e586.pt",
+    "dpt_large",
+    True,
+    )
+    '''
     dataset_path = "/data/xiwang/behave"
     run_preprocessing(dataset_path)
