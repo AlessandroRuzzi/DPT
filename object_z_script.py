@@ -208,7 +208,13 @@ def run_preprocessing(dataset_path):
                 print(curr_time_folder_path)
                 save_path_images = os.path.join("/data/aruzzi/behave_depth/sequences", folder, time)
                 os.makedirs(save_path_images)
-                break               
+                run(
+                    curr_time_folder_path,
+                    save_path_images,
+                    "weights/dpt_large-midas-2f21e586.pt",
+                    "dpt_large",
+                    True,
+                )             
                 
 
 
