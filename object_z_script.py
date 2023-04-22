@@ -193,7 +193,7 @@ def run_preprocessing(dataset_path):
         print(day,object_name)
 
         time_folders = os.listdir(curr_folder_path)
-        time_folders.sort()
+        time_folders.sort(reverse=False)
 
         for time in time_folders:
             if time != "info.json":
