@@ -235,7 +235,7 @@ def run_preprocessing_intercap(dataset_path):
                     cam_folders = os.listdir(seg_path)
                     cam_folders.sort()
                     for cam in cam_folders:
-                            cam_path = os.path.join(object_path, cam, "color")
+                            cam_path = os.path.join(seg_path, cam, "color")
                             torch.backends.cudnn.benchmark = True
                             print(cam_path)
                             save_path_images = os.path.join("/data/aruzzi/intercap_depth/RGBD_Images", subject, object, seg, cam , "color")
