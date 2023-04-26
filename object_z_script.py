@@ -236,15 +236,13 @@ def run_preprocessing_intercap(dataset_path):
                             save_path_images = os.path.join("/data/aruzzi/intercap_depth/RGBD_Images", subject, object, seg, cam , "color")
                             print(save_path_images)
                             os.makedirs(save_path_images)
-                            '''
                             run(
-                                curr_time_folder_path,
+                                cam_path,
                                 save_path_images,
                                 "weights/dpt_large-midas-2f21e586.pt",
                                 "dpt_large",
                                 True,
                             ) 
-                            '''
 
 def run_preprocessing_agd(dataset_path):
     sequences_path = os.path.join(dataset_path,"sequences")
