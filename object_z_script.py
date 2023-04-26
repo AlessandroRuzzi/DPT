@@ -173,7 +173,7 @@ def calc_near_bbox(classes, boxes, scores, masks):
     else:
             return human_center,human_mask, human_corners, (human_center, "human", human_corners, human_mask)
     
-def run_preprocessing_behave(dataset_path):
+def run_preprocessing_behave():
     dataset_path = "/data/xiwang/behave"
     sequences_path = os.path.join(dataset_path,"sequences")
     sub_folders = os.listdir(sequences_path)
@@ -212,7 +212,7 @@ def run_preprocessing_behave(dataset_path):
                     True,
                 )   
 
-def run_preprocessing_intercap(dataset_path):
+def run_preprocessing_intercap():
     dataset_path = "/data/xiwang/InterCap/RGBD_Images"
 
     if os.path.exists("/data/aruzzi/intercap_depth/RGBD_Images"):
@@ -250,7 +250,7 @@ def run_preprocessing_intercap(dataset_path):
                                 True,
                             ) 
 
-def run_preprocessing_agd(dataset_path):
+def run_preprocessing_agd():
     dataset_path = "/data/agavryushin/Datasets/AGD20K"
 
     if os.path.exists("/data/aruzzi/AGD20K_depth"):
@@ -486,15 +486,5 @@ if __name__ == "__main__":
     torch.set_num_threads(1)
     #"t0013.000_orig",
     torch.backends.cudnn.benchmark = True
-    '''
-    # compute depth maps
-    run(
-    "t0020.000",
-    "output_monodepth",
-    "weights/dpt_large-midas-2f21e586.pt",
-    "dpt_large",
-    True,
-    )
-    '''
-    dataset_path = "/data/xiwang/behave"
-    run_preprocessing_agd(dataset_path)
+
+    run_preprocessing_agd()
