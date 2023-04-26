@@ -207,6 +207,7 @@ def run_preprocessing_behave(dataset_path):
                     curr_time_folder_path,
                     save_path_images,
                     "weights/dpt_large-midas-2f21e586.pt",
+                    "*.color.jpg",
                     "dpt_large",
                     True,
                 )   
@@ -244,6 +245,7 @@ def run_preprocessing_intercap(dataset_path):
                                 cam_path,
                                 save_path_images,
                                 "weights/dpt_large-midas-2f21e586.pt",
+                                "*.jpg",
                                 "dpt_large",
                                 True,
                             ) 
