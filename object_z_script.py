@@ -212,7 +212,7 @@ def run_preprocessing_behave(dataset_path):
                 )   
 
 def run_preprocessing_intercap(dataset_path):
-    dataset_path = "/data/xiwang/Intercap/RGBD_Images"
+    dataset_path = "/data/xiwang/InterCap/RGBD_Images"
 
     subject_folders = os.listdir(dataset_path)
     subject_folders.sort()
