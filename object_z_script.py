@@ -173,7 +173,8 @@ def calc_near_bbox(classes, boxes, scores, masks):
     else:
             return human_center,human_mask, human_corners, (human_center, "human", human_corners, human_mask)
     
-def run_preprocessing(dataset_path):
+def run_preprocessing_behave(dataset_path):
+    dataset_path = "/data/xiwang/behave"
     sequences_path = os.path.join(dataset_path,"sequences")
     sub_folders = os.listdir(sequences_path)
     sub_folders.sort()
@@ -208,7 +209,79 @@ def run_preprocessing(dataset_path):
                     "weights/dpt_large-midas-2f21e586.pt",
                     "dpt_large",
                     True,
-                )             
+                )   
+
+def run_preprocessing_intercap(dataset_path):
+    dataset_path = "/data/xiwang/Intercap/RGBD_Images"
+
+    subject_folders = os.listdir(dataset_path)
+    subject_folders.sort()
+    for subject in subject_folders:
+        if subject in ["09", "10"]:
+            subject_path = os.path.join(dataset_path, subject)
+            object_folders = os.listdir(subject_path)
+            object_folders.sort()
+            for object in object_folders:
+                object_path = os.path.join(subject_path, object)
+                seg_folders = os.listdir(object_path)
+                seg_folders.sort()
+                for seg in seg_folders:
+                    seg_path = os.path.join(object_path, seg)
+                    cam_folders = os.listdir(seg_path)
+                    cam_folders.sort()
+                    for cam in cam_folders:
+                            cam_path = os.path.join(object_path, cam, "color")
+                            torch.backends.cudnn.benchmark = True
+                            print(cam_path)
+                            save_path_images = os.path.join("/data/aruzzi/intercap_depth/RGBD_Images", subject, object, seg, cam , "color")
+                            print(save_path_images)
+                            '''
+                            os.makedirs(save_path_images)
+                            run(
+                                curr_time_folder_path,
+                                save_path_images,
+                                "weights/dpt_large-midas-2f21e586.pt",
+                                "dpt_large",
+                                True,
+                            ) 
+                            '''
+
+def run_preprocessing_agd(dataset_path):
+    sequences_path = os.path.join(dataset_path,"sequences")
+    sub_folders = os.listdir(sequences_path)
+    sub_folders.sort()
+
+    for folder in sub_folders:
+    
+        curr_folder_path = os.path.join(sequences_path,folder)
+        save_path_root = os.path.join("/data/aruzzi/behave_depth/sequences", folder)
+
+        if os.path.exists(save_path_root):
+            shutil.rmtree(save_path_root, ignore_errors=True)
+        os.makedirs(save_path_root)
+
+        strtok = [str(x) for x in folder.split('_') if x.strip()]
+        day = int(strtok[0][-2:])
+        object_name = object_name_dict[strtok[2]]
+        print(day,object_name)
+
+        time_folders = os.listdir(curr_folder_path)
+        time_folders.sort(reverse=False)
+
+        for time in time_folders:
+            if time != "info.json":
+                curr_time_folder_path = os.path.join(curr_folder_path, time) 
+                torch.backends.cudnn.benchmark = True
+                print(curr_time_folder_path)
+                save_path_images = os.path.join("/data/aruzzi/behave_depth/sequences", folder, time)
+                os.makedirs(save_path_images)
+                run(
+                    curr_time_folder_path,
+                    save_path_images,
+                    "weights/dpt_large-midas-2f21e586.pt",
+                    "dpt_large",
+                    True,
+                )           
                 
 
 
@@ -415,4 +488,4 @@ if __name__ == "__main__":
     )
     '''
     dataset_path = "/data/xiwang/behave"
-    run_preprocessing(dataset_path)
+    run_preprocessing_intercap(dataset_path)
