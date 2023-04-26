@@ -8,6 +8,7 @@ __pycache__/
 
 t0*/
 saved_ckpt/
+wandb/
 
 # Distribution / packaging
 .Python
