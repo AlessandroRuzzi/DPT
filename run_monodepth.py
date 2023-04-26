@@ -17,7 +17,7 @@ from dpt.transforms import Resize, NormalizeImage, PrepareForNet
 #from util.misc import visualize_attention
 
 
-def run(input_path, output_path, model_path, model_type="dpt_hybrid", optimize=True):
+def run(input_path, output_path, model_path, img_string, model_type="dpt_hybrid", optimize=True):
     """Run MonoDepthNN to compute depth maps.
 
     Args:
@@ -117,7 +117,7 @@ def run(input_path, output_path, model_path, model_type="dpt_hybrid", optimize=T
     model.to(device)
 
     # get input
-    img_names = glob.glob(os.path.join(input_path, "*.color.jpg"))
+    img_names = glob.glob(os.path.join(input_path, img_string))
     num_images = len(img_names)
 
     # create output folder
