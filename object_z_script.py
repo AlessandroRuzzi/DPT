@@ -251,41 +251,46 @@ def run_preprocessing_intercap(dataset_path):
                             ) 
 
 def run_preprocessing_agd(dataset_path):
-    sequences_path = os.path.join(dataset_path,"sequences")
-    sub_folders = os.listdir(sequences_path)
-    sub_folders.sort()
+    dataset_path = "/data/agavryushin/Datasets/AGD20K"
 
-    for folder in sub_folders:
-    
-        curr_folder_path = os.path.join(sequences_path,folder)
-        save_path_root = os.path.join("/data/aruzzi/behave_depth/sequences", folder)
+    if os.path.exists("/data/aruzzi/AGD20K_depth"):
+        shutil.rmtree("/data/aruzzi/AGD20K_depth", ignore_errors=True)
+    os.makedirs("/data/aruzzi/AGD20K_depth")
 
-        if os.path.exists(save_path_root):
-            shutil.rmtree(save_path_root, ignore_errors=True)
-        os.makedirs(save_path_root)
-
-        strtok = [str(x) for x in folder.split('_') if x.strip()]
-        day = int(strtok[0][-2:])
-        object_name = object_name_dict[strtok[2]]
-        print(day,object_name)
-
-        time_folders = os.listdir(curr_folder_path)
-        time_folders.sort(reverse=False)
-
-        for time in time_folders:
-            if time != "info.json":
-                curr_time_folder_path = os.path.join(curr_folder_path, time) 
-                torch.backends.cudnn.benchmark = True
-                print(curr_time_folder_path)
-                save_path_images = os.path.join("/data/aruzzi/behave_depth/sequences", folder, time)
-                os.makedirs(save_path_images)
-                run(
-                    curr_time_folder_path,
-                    save_path_images,
-                    "weights/dpt_large-midas-2f21e586.pt",
-                    "dpt_large",
-                    True,
-                )           
+    seen_folders = os.listdir(dataset_path)
+    seen_folders.sort()
+    for seen in seen_folders:
+        seen_path = os.path.join(dataset_path, seen)
+        train_test_folders = os.listdir(seen_path)
+        train_test_folders.sort()
+        for train_test in train_test_folders:
+            train_test_path = os.path.join(seen_path, train_test)
+            mode_folders = os.listdir(train_test_path)
+            mode_folders.sort()
+            for mode in mode_folders:
+                if mode == "exocentric":
+                    mode_path = os.path.join(train_test_path, mode)
+                    action_folders = os.listdir(mode_path)
+                    action_folders.sort()
+                    for action in action_folders:
+                            action_path = os.path.join(mode_path, action)
+                            specific_folders = os.listdir(action_path)
+                            specific_folders.sort()
+                            for specif in specific_folders:
+                                specifc_path = os.path.join(action_path, specif)
+                                torch.backends.cudnn.benchmark = True
+                                print(specifc_path)
+                                save_path_images = os.path.join("/data/aruzzi/AGD20K_depth", seen, train_test, mode, action, specif)
+                                print(save_path_images)
+                                os.makedirs(save_path_images)
+                                run(
+                                    specifc_path,
+                                    save_path_images,
+                                    "weights/dpt_large-midas-2f21e586.pt",
+                                    "*.jpg",
+                                    "dpt_large",
+                                    True,
+                                )           
                 
 
 
@@ -492,4 +497,4 @@ if __name__ == "__main__":
     )
     '''
     dataset_path = "/data/xiwang/behave"
-    run_preprocessing_intercap(dataset_path)
+    run_preprocessing_agd(dataset_path)
