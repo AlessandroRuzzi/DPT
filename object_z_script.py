@@ -235,8 +235,8 @@ def run_preprocessing_intercap(dataset_path):
                             print(cam_path)
                             save_path_images = os.path.join("/data/aruzzi/intercap_depth/RGBD_Images", subject, object, seg, cam , "color")
                             print(save_path_images)
-                            '''
                             os.makedirs(save_path_images)
+                            '''
                             run(
                                 curr_time_folder_path,
                                 save_path_images,
