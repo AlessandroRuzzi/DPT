@@ -214,6 +214,10 @@ def run_preprocessing_behave(dataset_path):
 def run_preprocessing_intercap(dataset_path):
     dataset_path = "/data/xiwang/InterCap/RGBD_Images"
 
+    if os.path.exists("/data/aruzzi/intercap_depth/RGBD_Images"):
+        shutil.rmtree("/data/aruzzi/intercap_depth/RGBD_Images", ignore_errors=True)
+    os.makedirs("/data/aruzzi/intercap_depth/RGBD_Images")
+
     subject_folders = os.listdir(dataset_path)
     subject_folders.sort()
     for subject in subject_folders:
